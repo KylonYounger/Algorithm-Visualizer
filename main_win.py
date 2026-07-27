@@ -10,12 +10,15 @@
 import tkinter as tk
 from tkinter import ttk
 
+def selected(event):
+    var_label = tree.selection()
+    string = tree.item(var_label[0])
+    main_P_title.config(text = string["text"])
 
-def selected_list_item(event):
-    global main_P_title
-    new_label = tree.focus()
-    main_P_title = tk.Label(text = str(new_label))
-#apple
+    # returns string for tree selection argument passing for furture
+    # function calls.
+    return string["text"]
+
 
 # Main allows for imports of .py files that contain event structures or REPLACEING window widgets for certain data structure and algorithms.
 def main():
@@ -23,36 +26,54 @@ def main():
     root.title("Algorithm Visualizer")
     #root.iconbitmap()
     root.geometry("750x550")
-    root.minsize(500, 550)
-    root.maxsize(750, 550)
+    #root.minsize(750, 550)
+    #root.maxsize(750, 550)
 
     # Main Panel to allow images and animations.
     main_panel = tk.PanedWindow(root, bd = 10, bg = 'dark grey', relief = 'sunken')
-    main_panel.place(anchor = 'nw', relx = 0.45, rely = 0.5, x = 10, y = 100)
     main_panel.pack(fill = "both", ipady = 137, side = "top")
     
-    global main_P_title
-    # Sample Title label in panel
-    main_P_title = tk.Label(main_panel, text = "MAIN PANEL", activebackground = 'dark grey')
-    main_P_title.pack(side = "top")
-
     # FRAME widget - around the tree selector for DSA
     frame = tk.LabelFrame(root, padx = 10, text = 'Data Structures and Algorithms', pady = 100, border = 5, relief = 'ridge')
     frame.place(relx = 0.5, rely = 1.0, anchor = 's', relwidth = .99)
 
+    # Frame for notebook
+    notebook_frame = tk.Frame(root, padx = 10, pady = 10, border = 5, relief = 'ridge', height = 190)
+    notebook_frame.place(relx = 0.75, rely = 1.0, anchor = 'n', relwidth = 0.62)
+
+    Note_B_label = tk.Label(notebook_frame, text = 'apple', fg = "white", bg = "black")
+    Note_B_label.place(relx = 0.5, rely = 0.5, anchor = 'center', width = 100, height = 100)
+
+    notebook_frame_2 = tk.Frame(root, padx = 10, pady = 10, border = 5, relief = 'ridge', height = 190)
+    notebook_frame_2.place(relx = 0.75, rely = 1.0, anchor = 'n', relwidth = 0.62)
+
+    # Notebook it's self
+    main_notebook = ttk.Notebook(root)
+    main_notebook.place(relx = 0.8, rely = 1.0, anchor = 's' + 'e', relwidth = 0.59, x = 140, y = -12)
+    main_notebook.add(notebook_frame, text = "Description")
+    main_notebook.add(notebook_frame_2, text = "Input Settings")
+    
     # Weird frame grid placer for tree viewer. If did not exist, frame will not display.
     # probaly need future fix
     display_frame_lable = tk.Label(frame, pady = 0)
-    display_frame_lable.grid(row = 0, column = 0)
+    display_frame_lable.pack()
 
     global tree
     # Tree widget - contains all DSA options to display.
     tree = ttk.Treeview(frame, selectmode = "browse", show = 'tree', yscrollcommand = 'tree_scroll_bar')
     tree.place(relx = 0.01, rely = 0.999, anchor = 'nw', width = 275, y = -110, x = -10)
-    # tree.tag_configure(tagname = 'font_change', font = 'Broadway')
-    tree.bind("<<TreeviewSelect>>", selected_list_item)
+    # tree.tag_configure(tagname = 'font_change', font = 'Broadway')]
 
-    # Tree Scroll Bar - Needs improvment..
+    # Mouse double left click for tree widget and enter too select the tree
+    tree.bind("<Double-1>", selected)
+    tree.bind("<Return>", selected)
+
+    global main_P_title
+    # Sample Title label in panel
+    main_P_title = tk.Label(main_panel, text = "MAIN PANEL", relief = 'raised')
+    main_P_title.pack(side = "top")
+
+    # Tree Scroll Bar - Needs improvement..
     tree_scroll_bar = tk.Scrollbar(tree)
     tree_scroll_bar.config(command = tree.yview)
     tree_scroll_bar.place(in_ = tree, x = 271, relx = 0.01, relheight = 0.99, anchor = 'e', y = 101)
@@ -91,7 +112,6 @@ def main():
     tree.insert(parent = '5', index = 4, text = "Breadth First Search")
     tree.insert(parent = '5', index = 5, text = "Depth First Search")
     tree.insert(parent = '5', index = 6, text = "Weight Based Graph Search")
-
 
     #Sorting Algorithms (parent and children)
     tree.insert(parent = '', index = 3, iid = 3, text = "Sorting Algorithms")
