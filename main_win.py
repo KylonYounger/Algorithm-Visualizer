@@ -12,6 +12,15 @@ import DSA_descriptions as des
 import tkinter as tk
 from tkinter import ttk
 
+def mouse_canvas_move(e):
+    
+    main_P_xy.config(text = "x = " + str(e.x) + ' ' + 'y = ' + str(e.y))
+    new_frame.place(x = e.x - 25, y = e.y - 25)
+    
+
+
+    
+
 def selected(event):
     # Sets main planels lable with tree selected item
     var_label = tree.selection()
@@ -19,19 +28,25 @@ def selected(event):
     main_P_title.config(text = string["text"])
 
     Note_B_label.config(state = 'normal')
-    # Add much of existing DSAS to diction      : TODO
+    # Add much of existing DSAs to diction      : TODO
     matcher_dic = {"List": 0, "Dictionary": 1}
 
     Note_B_label.delete(0.0, tk.END)
 
-    # Set description Notebook label to selected tree item
+    # NOTEBOOK TAB 1
+    # Set tab 1s' description; Sets Notebook text widget to selected tree item;
     if matcher_dic.get(string['text']) is not None:
         notebook_text = des.DSA_des_index(matcher_dic[string['text']])
         Note_B_label.insert("1.0", notebook_text)
     Note_B_label.config(state = 'disabled')
+
+    # NOTEBOOK TAB 2
+    # Sets buttons and widgets to the corrasponding data structure in the notebook tab.
+    # Needs to be changed after different selections
+    # Might need helper functions but generally get created after each data structure it implimented
+
     
     return None
-
 
 # Main allows for imports of .py files that contain event structures or REPLACEING window widgets for certain data structure and algorithms.
 def main():
@@ -42,9 +57,39 @@ def main():
     #root.minsize(750, 550)
     #root.maxsize(750, 550)
 
+    global main_panel
     # Main Panel to allow images and animations.
-    main_panel = tk.PanedWindow(root, bd = 10, bg = 'dark grey', relief = 'sunken')
+    main_panel = tk.Canvas(root, bd = 10, bg = 'dark grey', relief = 'sunken')
     main_panel.pack(fill = "both", ipady = 137, side = "top")
+
+    global new_frame
+    new_frame = tk.Frame(main_panel, bg = 'red', border = 10, width = 50, height = 50, relief = 'raised')
+    new_frame.place(x = 100, y = 100)
+    new_frame_2 = tk.Frame(main_panel, bg = 'red', border = 10, width = 50, height = 50, relief = 'raised')
+    new_frame_2.place(x = 150, y = 150)
+    
+    main_panel.bind("<B1-Motion>", mouse_canvas_move)
+    # =========================#TODO Graphical representations#=================================
+    # Current thoughts of graphical animations, Having movable boxes?
+    # If I have a list, I initiate a list with [0, 1, 2, 3]. If I want to add boxes or
+    # move boxes around. Maybe some way to show that a list is ordered?
+    ## Boxes can be used for many future representations. Can be moveable or not.
+    # Node Boxes as well. Will need a scrollable window, and zoom in and out maybe?
+    # Will have to be able to pass algorithm data in or OUT? If I adjust a Binary tree will
+    # it adjust dynamically? If you move a sorted array out of sort and press sort will it re-
+    # sort?
+    #
+    # Will this be a seperate file for each case?
+    # Was planning a seperate file for each DSA (THIS WILL BE ONE SEPERATE FILE)
+    #
+    # For now impliment simple show cases of current Data structures with initail data being passed.
+    # Class for box?
+
+    #PS = tk.Frame(main_panel, border = 5, relief = 'ridge')
+    #PS.place(relx = 0.9, rely = 0.5, width = 50, height = 50, x = -100)
+    
+    
+    # =======================================================================
     
     # FRAME widget - around the tree selector for DSA and the notebook widget
     frame = tk.LabelFrame(root, padx = 10, text = 'Data Structures and Algorithms', pady = 100, border = 5, relief = 'ridge')
@@ -54,11 +99,11 @@ def main():
     main_notebook = ttk.Notebook(root)
     main_notebook.place(relx = 0.8, rely = 1.0, anchor = 's' + 'e', relwidth = 0.59, x = 140, y = -12)
     
-    # Frame for notebook tabs
+    # Frame for 1st tab (Description tab)
     notebook_frame = tk.Frame(root, padx = 10, pady = 10, border = 5, relief = 'ridge', height = 190)
     notebook_frame.place(relx = 0.75, rely = 1.0, anchor = 'n', relwidth = 0.62)
 
-    # frame for 2nd tab
+    # frame for 2nd tab (Function Input)
     notebook_frame_2 = tk.Frame(root, padx = 10, pady = 10, border = 5, relief = 'ridge', height = 190)
     notebook_frame_2.place(relx = 0.75, rely = 1.0, anchor = 'n', relwidth = 0.62)
 
@@ -69,9 +114,9 @@ def main():
 
     # adding tabs and labels
     main_notebook.add(notebook_frame, text = "Description")
-    main_notebook.add(notebook_frame_2, text = "Input Settings")
+    main_notebook.add(notebook_frame_2, text = "Function Input")
 
-    # Notebook Frame - Needs improvement..
+    # Notebook Scroll bar - Needs improvement..
     NB_scroll = tk.Scrollbar(root, orient = 'vertical')
     NB_scroll.config(command = Note_B_label.yview)
     NB_scroll.place(in_ = Note_B_label, x = 402, relx = 0.1, relheight = 0.99, anchor = 'e', y = 87)
@@ -95,6 +140,10 @@ def main():
     # Sample Title label in panel
     main_P_title = tk.Label(main_panel, text = "MAIN PANEL", relief = 'raised')
     main_P_title.pack(side = "top")
+
+    global main_P_xy
+    main_P_xy = tk.Label(main_panel, text = "MAIN PANEL", relief = 'raised')
+    main_P_xy.pack(side = 'bottom')
 
     # Tree Scroll Bar - Needs improvement..
     tree_scroll_bar = tk.Scrollbar(tree, orient = 'vertical')
@@ -136,7 +185,7 @@ def main():
     tree.insert(parent = '5', index = 5, text = "Depth First Search")
     tree.insert(parent = '5', index = 6, text = "Weight Based Graph Search")
 
-    #Sorting Algorithms (parent and children)
+    # Sorting Algorithms (parent and children)
     tree.insert(parent = '', index = 3, iid = 3, text = "Sorting Algorithms")
     tree.insert(parent = '3', index = 0, text = "Item 1")
 
