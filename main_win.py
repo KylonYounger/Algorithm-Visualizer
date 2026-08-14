@@ -7,19 +7,46 @@
 # data structures, algorithms, git and github, and frontend user interaction.
 # ============================================================================================
 
-
 import DSA_descriptions as des
+from DSA_InputSpecs import *
 import tkinter as tk
 from tkinter import ttk
 
-def mouse_canvas_move(e):
-    
-    main_P_xy.config(text = "x = " + str(e.x) + ' ' + 'y = ' + str(e.y))
-    new_frame.place(x = e.x - 25, y = e.y - 25)
-    
+def apply_list():
+    x_pos = 50
+    # UPDATE Canvas
+    for x in list_num:
+        box_temp = tk.Frame(main_panel, bd = 10, width = 50, height = 50, relief = 'raised')
+        box_temp.place(x = x_pos, y = 120)
+        x_pos += 50
+
+        box_label = tk.Label(box_temp, text = x)
+        box_label.place(anchor = 's', x = 14, y = 25)
+    return None
 
 
-    
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+# Clears any given widget of its children
+#   Returns - None
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+def clear_frame(frame):
+    # Destroy all widgets inside the frame
+    for widget in frame.winfo_children():
+        widget.destroy()
+
+# =================================================================================================
+
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+# SELECTED - Gets TreeView selected item, matches the string to given dictionary, and replaces:
+#    
+#    Done: - Notebook decriptions
+#          - Main Canvases label (main_P_title)
+#               
+#    TODO: - canvas animations / images
+#          - user input
+#   
+#          - Returns None
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 def selected(event):
     # Sets main planels lable with tree selected item
@@ -28,13 +55,16 @@ def selected(event):
     main_P_title.config(text = string["text"])
 
     Note_B_label.config(state = 'normal')
-    # Add much of existing DSAs to diction      : TODO
+
+    # Add much of existing DSAs to diction  : TODO
     matcher_dic = {"List": 0, "Dictionary": 1}
 
     Note_B_label.delete(0.0, tk.END)
 
     # NOTEBOOK TAB 1
     # Set tab 1s' description; Sets Notebook text widget to selected tree item;
+    # Uses seperate file dictionary to match "tree.selection()" which is selected user item
+    # Turns it into key pair and gets index of key for description to paste
     if matcher_dic.get(string['text']) is not None:
         notebook_text = des.DSA_des_index(matcher_dic[string['text']])
         Note_B_label.insert("1.0", notebook_text)
@@ -42,14 +72,35 @@ def selected(event):
 
     # NOTEBOOK TAB 2
     # Sets buttons and widgets to the corrasponding data structure in the notebook tab.
-    # Needs to be changed after different selections
-    # Might need helper functions but generally get created after each data structure it implimented
+    # CALL HELPER FUNCTION - contain matcher for each DSA and places into tab 2
+    clear_frame(notebook_frame_2)
 
+    global list_num
+    list_num = []
+    if matcher_dic.get(string['text']) is not None:
+        list_num = Input_Def(notebook_frame_2, matcher_dic.get(string['text']))
     
+
     return None
+
+# =================================================================================================
+
+
+
+# =================================================================================================
+
+# Main
+
+# =================================================================================================
 
 # Main allows for imports of .py files that contain event structures or REPLACEING window widgets for certain data structure and algorithms.
 def main():
+
+
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    # MAIN WINDOW
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
     root = tk.Tk()
     root.title("Algorithm Visualizer")
     #root.iconbitmap()
@@ -57,43 +108,72 @@ def main():
     #root.minsize(750, 550)
     #root.maxsize(750, 550)
 
-    global main_panel
+    # =================================================================================================
+
+
+
+
+
+
+
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    # CANVAS for main display of Animations/DSAs
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
     # Main Panel to allow images and animations.
+    global main_panel
     main_panel = tk.Canvas(root, bd = 10, bg = 'dark grey', relief = 'sunken')
     main_panel.pack(fill = "both", ipady = 137, side = "top")
 
-    global new_frame
-    new_frame = tk.Frame(main_panel, bg = 'red', border = 10, width = 50, height = 50, relief = 'raised')
-    new_frame.place(x = 100, y = 100)
-    new_frame_2 = tk.Frame(main_panel, bg = 'red', border = 10, width = 50, height = 50, relief = 'raised')
-    new_frame_2.place(x = 150, y = 150)
+    # =================================================================================================
+
     
-    main_panel.bind("<B1-Motion>", mouse_canvas_move)
-    # =========================#TODO Graphical representations#=================================
-    # Current thoughts of graphical animations, Having movable boxes?
-    # If I have a list, I initiate a list with [0, 1, 2, 3]. If I want to add boxes or
-    # move boxes around. Maybe some way to show that a list is ordered?
-    ## Boxes can be used for many future representations. Can be moveable or not.
-    # Node Boxes as well. Will need a scrollable window, and zoom in and out maybe?
-    # Will have to be able to pass algorithm data in or OUT? If I adjust a Binary tree will
-    # it adjust dynamically? If you move a sorted array out of sort and press sort will it re-
-    # sort?
+
+
+
+
+
+
+    # ================================# TODO Graphical representations #===============================
+    # ANIMATIONS!!
+    #   After messing with being able to move around a box and having the user mess with the
+    #   representation of the DSA, I have decided to create a animation set of given input varibles? 
+    #   (Still need to test the implimentation)
     #
-    # Will this be a seperate file for each case?
-    # Was planning a seperate file for each DSA (THIS WILL BE ONE SEPERATE FILE)
+    # One file for all DSA
     #
     # For now impliment simple show cases of current Data structures with initail data being passed.
-    # Class for box?
+    # Class for animations?
+    # =================================================================================================
+    
 
-    #PS = tk.Frame(main_panel, border = 5, relief = 'ridge')
-    #PS.place(relx = 0.9, rely = 0.5, width = 50, height = 50, x = -100)
-    
-    
-    # =======================================================================
-    
+
+
+
+
+
+
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    # FRAME for Notebook and TreeView
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
     # FRAME widget - around the tree selector for DSA and the notebook widget
     frame = tk.LabelFrame(root, padx = 10, text = 'Data Structures and Algorithms', pady = 100, border = 5, relief = 'ridge')
     frame.place(relx = 0.5, rely = 1.0, anchor = 's', relwidth = .99)
+
+    # =================================================================================================
+
+
+
+
+
+
+
+
+
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    # NOTEBOOK Display
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     # Notebook it's self
     main_notebook = ttk.Notebook(root)
@@ -104,8 +184,12 @@ def main():
     notebook_frame.place(relx = 0.75, rely = 1.0, anchor = 'n', relwidth = 0.62)
 
     # frame for 2nd tab (Function Input)
+    global notebook_frame_2
     notebook_frame_2 = tk.Frame(root, padx = 10, pady = 10, border = 5, relief = 'ridge', height = 190)
     notebook_frame_2.place(relx = 0.75, rely = 1.0, anchor = 'n', relwidth = 0.62)
+
+    list_button3 = tk.Button(main_panel, command = apply_list, text = 'apply')
+    list_button3.place(anchor = 'nw', x = 725, y = 255)
 
     # Label for notebook frame
     global Note_B_label
@@ -121,34 +205,69 @@ def main():
     NB_scroll.config(command = Note_B_label.yview)
     NB_scroll.place(in_ = Note_B_label, x = 402, relx = 0.1, relheight = 0.99, anchor = 'e', y = 87)
 
-    # Weird frame grid placer for tree viewer. If did not exist, frame will not display.
-    # probaly need future fix
-    display_frame_lable = tk.Label(frame, pady = 0)
-    display_frame_lable.pack()
+    # =================================================================================================
 
-    global tree
+
+
+
+
+
+
+
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    # TREE Display
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
     # Tree widget - contains all DSA options to display.
+    global tree
     tree = ttk.Treeview(frame, selectmode = "browse", show = 'tree', yscrollcommand = 'tree_scroll_bar')
     tree.place(relx = 0.01, rely = 0.999, anchor = 'nw', width = 275, y = -110, x = -10)
-    # tree.tag_configure(tagname = 'font_change', font = 'Broadway')]
 
     # Mouse double left click for tree widget and enter too select the tree
     tree.bind("<Double-1>", selected)
     tree.bind("<Return>", selected)
 
-    global main_P_title
-    # Sample Title label in panel
-    main_P_title = tk.Label(main_panel, text = "MAIN PANEL", relief = 'raised')
-    main_P_title.pack(side = "top")
-
-    global main_P_xy
-    main_P_xy = tk.Label(main_panel, text = "MAIN PANEL", relief = 'raised')
-    main_P_xy.pack(side = 'bottom')
-
     # Tree Scroll Bar - Needs improvement..
     tree_scroll_bar = tk.Scrollbar(tree, orient = 'vertical')
     tree_scroll_bar.config(command = tree.yview)
     tree_scroll_bar.place(in_ = tree, x = 271, relx = 0.01, relheight = 0.99, anchor = 'e', y = 101)
+
+    # Weird frame grid placer for tree viewer. If did not exist, frame will not display.
+    # probaly need future fix
+    display_frame_lable = tk.Label(frame, pady = 0)
+    display_frame_lable.pack()
+
+    # =================================================================================================
+
+
+
+
+
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    # Label Display
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    
+    # Title label in panel
+    global main_P_title
+    main_P_title = tk.Label(main_panel, text = "Select your DSA", relief = 'raised')
+    main_P_title.pack(side = "top")
+
+    # =================================================================================================
+
+
+
+
+
+
+
+
+    # =================================================================================================
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    
+    # Hard-Coded Info Section
+
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    # =================================================================================================
 
     # Built-In Data Structures (parent and children)
     tree.insert(parent = '', index = 0, iid = 0, text = "Built-In Data Structures (Python)")
@@ -190,9 +309,17 @@ def main():
     tree.insert(parent = '3', index = 0, text = "Item 1")
 
 
+
+    # =================================================================================================
+
     root.mainloop()
-if __name__ == "__main__":
+if __name__ == "__main__":#
     main()
+
+# END
+
+
+
 
 
 # Font viewer to copy and change font
