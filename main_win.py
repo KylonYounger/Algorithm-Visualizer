@@ -1,28 +1,30 @@
 # ============================================================================================
 # Kylon Younger 
-# current version 0.0.1 7/21/2026
+# current version 0.0.5 8/14/2026
 # Algorithm Visualizer uses tkinter library to create a desktop application that allows a user
 # to visualy see animations and graphs of algorithms and their runtimes. 
 # This project allows me to get a great understanding of larger projects, 
 # data structures, algorithms, git and github, and frontend user interaction.
 # ============================================================================================
-
+#   Last worked on goes here: XD
+#      Was working on list input buttons
+#      Current Error with changing the apply box background color
+#      for when the apply button should be applied.
+#
+# ============================================================================================
+# - GLOBAL PARAMETERS:
+#   - global list_num
+#   - global main_panel
+#   - global notebook_frame_2
+#   - global Note_B_label
+#   - global tree
+#   - global main_P_title
+# ============================================================================================
 import DSA_descriptions as des
 from DSA_InputSpecs import *
+import Display as dis
 import tkinter as tk
 from tkinter import ttk
-
-def apply_list():
-    x_pos = 50
-    # UPDATE Canvas
-    for x in list_num:
-        box_temp = tk.Frame(main_panel, bd = 10, width = 50, height = 50, relief = 'raised')
-        box_temp.place(x = x_pos, y = 120)
-        x_pos += 50
-
-        box_label = tk.Label(box_temp, text = x)
-        box_label.place(anchor = 's', x = 14, y = 25)
-    return None
 
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -35,6 +37,8 @@ def clear_frame(frame):
         widget.destroy()
 
 # =================================================================================================
+
+
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # SELECTED - Gets TreeView selected item, matches the string to given dictionary, and replaces:
@@ -74,12 +78,11 @@ def selected(event):
     # Sets buttons and widgets to the corrasponding data structure in the notebook tab.
     # CALL HELPER FUNCTION - contain matcher for each DSA and places into tab 2
     clear_frame(notebook_frame_2)
-
-    global list_num
-    list_num = []
-    if matcher_dic.get(string['text']) is not None:
-        list_num = Input_Def(notebook_frame_2, matcher_dic.get(string['text']))
     
+    if matcher_dic.get(string['text']) is not None:
+        clear_frame(main_panel)
+        list_button3.config(state = 'active')
+        Input_Def(notebook_frame_2, matcher_dic.get(string['text']), list_button3)
 
     return None
 
@@ -129,6 +132,17 @@ def main():
 
     
 
+
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    # Label Display
+    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    
+    # Title label in panel
+    global main_P_title
+    main_P_title = tk.Label(root, text = "Select your DSA", relief = 'raised')
+    main_P_title.place(relx = 0.5, anchor = 'n')
+
+    # =================================================================================================
 
 
 
@@ -188,8 +202,9 @@ def main():
     notebook_frame_2 = tk.Frame(root, padx = 10, pady = 10, border = 5, relief = 'ridge', height = 190)
     notebook_frame_2.place(relx = 0.75, rely = 1.0, anchor = 'n', relwidth = 0.62)
 
-    list_button3 = tk.Button(main_panel, command = apply_list, text = 'apply')
-    list_button3.place(anchor = 'nw', x = 725, y = 255)
+    global list_button3
+    list_button3 = tk.Button(root, command = lambda: dis.apply_list(main_panel, list_button3), text = 'apply', state = 'disabled')
+    list_button3.place(anchor = 'nw', x = 728, y = 277)
 
     # Label for notebook frame
     global Note_B_label
@@ -243,16 +258,7 @@ def main():
 
 
 
-    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-    # Label Display
-    # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-    
-    # Title label in panel
-    global main_P_title
-    main_P_title = tk.Label(main_panel, text = "Select your DSA", relief = 'raised')
-    main_P_title.pack(side = "top")
 
-    # =================================================================================================
 
 
 
