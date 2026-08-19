@@ -7,7 +7,41 @@ import DSA_InputSpecs as Inp
         that to any type of selected tree item. Then either a play button or the
         apply button will start / reset the animations.
 
+        - Create class that allows the object instance of a Frame with a label. This should be the base
+        class that allows for sub-classes and inheritance to take place.
+
 '''
+BOX_WIDTH = 50
+BOX_HEIGHT = 50
+BOX_RELIEF = 'raised'
+
+
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+# - Class for Display box
+#   - Uses 
+#   - Inherites from Frame 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+class box(tk.Frame):
+    def __init__(self, master, label, x_pos, y_pos):
+        super().__init__(master, width = BOX_WIDTH, height = BOX_HEIGHT, relief = BOX_RELIEF, bd = 10)
+
+        self.y_mov_s = 0
+        self.fin_pos = y_pos
+        self.place(x = x_pos)
+        
+        self.box_label = tk.Label(self, text = label)
+        self.box_label.place(anchor = 's', x = 14, rely = 0.9) # CENTER OF BOX_TEMP
+
+    def sliding_frame(self):
+        if self.y_mov_s <= self.fin_pos:
+            self.y_mov_s += 1
+            self.update_idletasks()
+            self.place(y = self.y_mov_s)
+            self.after(3, self.sliding_frame)
+
+
+# =================================================================================================
+
 
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -16,18 +50,15 @@ import DSA_InputSpecs as Inp
 #   Returns - None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 def apply_list(master, list_button3):
-    x_pos = 50
+    x_pos = 35
+    name_index = 0
+
     list_button3.config(bg = 'light grey', activebackground = 'light grey')
     clear_frame(master)
     # UPDATE Canvas
     for x in Inp.given_input:
-        global box_temp
-        box_temp = tk.Frame(master, bd = 10, width = 50, height = 50, relief = 'raised')
-        box_temp.place(x = x_pos, y = 120)
         x_pos += 50
-
-        box_label = tk.Label(box_temp, text = x)
-        box_label.place(anchor = 's', x = 14, y = 25)
+        box(master, x, x_pos, 125).sliding_frame()
 
     return None
 
