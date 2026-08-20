@@ -23,6 +23,11 @@ def Input_Def(master, x, list_button3):
     given_input = []
     match x:
         case 0:
+            # LIST FACTS: Can have multiple data types
+            # can have duplicates
+            # can change, add, remove after created
+            # is ordered
+
 
             list_label = tk.Label(master, text = "List Input: ")
             list_label.place(anchor = 'nw', x = -10, y = -10)
@@ -36,6 +41,8 @@ def Input_Def(master, x, list_button3):
             list_Button = tk.Button(master, text = 'remove end', command = lambda: list_remove_end(list_button3))
             list_Button.place(anchor = 'nw', x = 315, y = 26)
 
+
+
             # Tlc function to pass function correctly for wrapper
             vcmd = master.register(entry_checker)
 
@@ -45,7 +52,17 @@ def Input_Def(master, x, list_button3):
             list_box.place(anchor = 'nw', x = 0, y = 50)
             list_box.insert(0, '0,1,2,3,4')
 
+            global list_box_2
+            global list_box_3
+            list_box_2 = tk.Entry(master, bd = 3, width = 5, validate = 'key', validatecommand = (vcmd, "%P"))
+            list_box_2.place(anchor = 'nw', x = 0, y = 70)
+
+            list_box_3 = tk.Entry(master, bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
+            list_box_3.place(anchor = 'nw', x = 0, y = 90)
+
             list_box.bind("<Return>", lambda e: val_ent(e, list_button3))
+            list_box_2.bind("<Return>", lambda e: list_change_index(int(list_box_2.get()), int(list_box_3.get()), list_button3))
+            list_box_3.bind("<Return>", lambda e: list_change_index(int(list_box_2.get()), int(list_box_3.get()), list_button3))
 
         case 1:
             pass
@@ -124,12 +141,12 @@ def list_add_rand(list_button3):
 
 # =================================================================================================
 
-# Sample radio buttons for notebook tab 2
-'''
-radBut0 = tk.Radiobutton(master, text = ' None ', variable = l, value = 0, command = lambda: clicked(l.get()))
-radBut0.place(anchor = 'nw', x = -10, y = 10)
-radBut1 = tk.Radiobutton(master, text = 'apple', variable = l, value = 1, command = lambda: clicked(l.get()))
-radBut1.place(anchor = 'nw', x = -10, y = 30)
-radBut2 = tk.Radiobutton(master, text = 'pear', variable = l, value = 2, command = lambda: clicked(l.get()))
-radBut2.place(anchor = 'nw', x = -10, y = 50)
-'''
+def list_change_index(x, new_num, list_button3):
+    if x <= len(given_input):
+        list_button3.config(bg = 'pink', activebackground = 'pink')
+        given_input[x] = new_num
+        list_box_2.delete(0, tk.END)
+        list_box_3.delete(0, tk.END)
+    else:
+        # place label for bad index of change location!
+        pass
