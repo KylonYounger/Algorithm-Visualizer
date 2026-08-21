@@ -22,23 +22,29 @@ BOX_RELIEF = 'raised'
 #   - Inherites from Frame 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 class box(tk.Frame):
+    all_boxes = []
+
     def __init__(self, master, label, x_pos, y_pos):
         super().__init__(master, width = BOX_WIDTH, height = BOX_HEIGHT, relief = BOX_RELIEF, bd = 10)
 
         self.y_mov_s = 0
         self.fin_pos = y_pos
         self.place(x = x_pos)
-        
-        self.box_label = tk.Label(self, text = label)
-        self.box_label.place(anchor = 's', x = 14, rely = 0.9) # CENTER OF BOX_TEMP
 
+        if len(str(label)) >= 5:
+            self.config(width = BOX_WIDTH + ((len(str(label))) * 5))
+            
+        self.box_label = tk.Label(self, text = label)
+        self.box_label.place(anchor = 's', relx = .5, rely = 0.9) # CENTER OF BOX_TEMP
+
+    # Animation for the insert of a new block
     def sliding_frame(self):
         if self.y_mov_s <= self.fin_pos:
             self.y_mov_s += 1
-            self.update_idletasks()
             self.place(y = self.y_mov_s)
-            self.after(3, self.sliding_frame)
-
+            self.update()
+            self.after(1, self.sliding_frame)
+        
 
 # =================================================================================================
 
@@ -50,15 +56,24 @@ class box(tk.Frame):
 #   Returns - None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 def apply_list(master, list_button3):
+    
+    box_list = []
     x_pos = 35
-    name_index = 0
 
     list_button3.config(bg = 'light grey', activebackground = 'light grey')
-    clear_frame(master)
+    clear_frame_object(master)
     # UPDATE Canvas
-    for x in Inp.given_input:
-        x_pos += 50
-        box(master, x, x_pos, 125).sliding_frame()
+
+    for index in range(0, len(Inp.given_input)):
+        if index > 0:
+            box_temp = box_list[index - 1]
+            x_pos += int(box_temp.cget('width'))
+
+        box_list.append(box(master, Inp.given_input[index], x_pos, 125))
+
+    for single_box in box_list:
+        single_box.sliding_frame()
+
 
     return None
 
@@ -66,12 +81,14 @@ def apply_list(master, list_button3):
 
 
 
+
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Clears any given widget of its children
 #   Returns - None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-def clear_frame(frame):
+def clear_frame_object(frame):
     # Destroy all widgets inside the frame
+    # box contains 
     for widget in frame.winfo_children():
         widget.destroy()
 

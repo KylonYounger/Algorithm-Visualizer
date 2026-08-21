@@ -6,10 +6,6 @@
 # This project allows me to get a great understanding of larger projects, 
 # data structures, algorithms, git and github, and frontend user interaction.
 # ============================================================================================
-#   Last worked on goes here: XD
-#      Was working on list input buttons
-#      Current Error with changing the apply box background color
-#      for when the apply button should be applied.
 #
 # ============================================================================================
 # - GLOBAL PARAMETERS:
@@ -25,7 +21,6 @@ from DSA_InputSpecs import *
 import Display as dis
 import tkinter as tk
 from tkinter import ttk
-
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Clears any given widget of its children
@@ -95,7 +90,6 @@ def selected(event):
 # Main
 
 # =================================================================================================
-
 # Main allows for imports of .py files that contain event structures or REPLACEING window widgets for certain data structure and algorithms.
 def main():
 
@@ -103,7 +97,6 @@ def main():
     # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     # MAIN WINDOW
     # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-
     root = tk.Tk()
     root.title("Algorithm Visualizer")
     #root.iconbitmap()
