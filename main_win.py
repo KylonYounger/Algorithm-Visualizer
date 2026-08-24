@@ -85,6 +85,55 @@ def selected(event):
 
 
 
+
+def helper_window(e, widget):
+    # only if ~ is pressed creates new window
+    if e.char == "~":
+        helper = tk.Tk()
+
+        label = tk.Label(helper, text = 'Dev tool for notebook Tab 2')
+        label.pack()
+        # Entry box for x pos
+        label_x = tk.Label(helper, text = 'x position of wiget')
+        label_x.pack()
+        ent_x = tk.Entry(helper, bd = 1)
+        ent_x.pack()
+        # Entry box for y pos
+        label_y = tk.Label(helper, text = 'y position of wiget')
+        label_y.pack()
+        ent_y = tk.Entry(helper, bd = 1)
+        ent_y.pack()
+
+        # sets list box with a list of all child widgets of current selected DSA in treeview
+        child_list_box = tk.Listbox(helper)
+        for item in widget.winfo_children():
+            child_list_box.insert(tk.END, item)
+
+        box_label = tk.Label(helper, text = 'List of Child widgets')
+        box_label.pack()
+
+        child_list_box.pack()
+        child_list = widget.winfo_children()
+
+        # Passes the box list and tuple of widget children that can be accessed
+        helper.bind('<Return>', lambda e: apply_new_pos(e, ent_x.get(), ent_y.get(), child_list_box, child_list))
+
+
+
+
+def apply_new_pos(e, pos_x, pos_y, child_box, child_list):
+    # Sets the selected list box children with the entry box numbers
+    selection = child_box.curselection()
+    if selection:
+        index = selection[0]
+        # Changes selected widget x and y pos
+        child = child_list[index]
+        child.place(x = pos_x, y = pos_y)
+        print(pos_x, pos_y)
+
+
+
+
 # =================================================================================================
 
 # Main
@@ -111,15 +160,14 @@ def main():
 
 
 
-
     # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     # CANVAS for main display of Animations/DSAs
     # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
     # Main Panel to allow images and animations.
     global main_panel
-    main_panel = tk.Canvas(root, bd = 10, bg = 'dark grey', relief = 'sunken')
-    main_panel.pack(fill = "both", ipady = 137, side = "top")
+    main_panel = tk.Canvas(root, bd = 10, bg = 'dark grey', relief = 'sunken', width = 760, height = 290)
+    main_panel.pack()
 
     # =================================================================================================
 
@@ -137,25 +185,7 @@ def main():
 
     # =================================================================================================
 
-
-
-
-
-    # ================================# TODO Graphical representations #===============================
-    # ANIMATIONS!!
-    #   After messing with being able to move around a box and having the user mess with the
-    #   representation of the DSA, I have decided to create a animation set of given input varibles? 
-    #   (Still need to test the implimentation)
-    #
-    # One file for all DSA
-    #
-    # For now impliment simple show cases of current Data structures with initail data being passed.
-    # Class for animations?
-    # =================================================================================================
     
-
-
-
 
 
 
@@ -194,6 +224,8 @@ def main():
     global notebook_frame_2
     notebook_frame_2 = tk.Frame(root, padx = 10, pady = 10, border = 5, relief = 'ridge', height = 190)
     notebook_frame_2.place(relx = 0.75, rely = 1.0, anchor = 'n', relwidth = 0.62)
+    # Dev tool for tab 2 input setup
+    root.bind("<asciitilde>", lambda event: helper_window(event, notebook_frame_2))
 
     global list_button3
     list_button3 = tk.Button(root, command = lambda: dis.apply_list(main_panel, list_button3), text = 'apply', state = 'disabled')

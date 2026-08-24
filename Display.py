@@ -29,7 +29,7 @@ class box(tk.Frame):
 
         self.y_mov_s = 0
         self.fin_pos = y_pos
-        self.place(x = x_pos)
+        self.x_fin = x_pos
 
         if len(str(label)) >= 5:
             self.config(width = BOX_WIDTH + ((len(str(label))) * 5))
@@ -39,11 +39,16 @@ class box(tk.Frame):
 
     # Animation for the insert of a new block
     def sliding_frame(self):
-        if self.y_mov_s <= self.fin_pos:
-            self.y_mov_s += 1
-            self.place(y = self.y_mov_s)
-            self.update()
-            self.after(1, self.sliding_frame)
+        self.place(x = self.x_fin)
+        fac = (self.fin_pos - 35) / 100
+        print(fac)
+        while(True):
+            if self.y_mov_s <= self.fin_pos:
+                self.y_mov_s += (0.01 + fac)
+                self.place(y = self.y_mov_s)
+                self.update()
+            else:
+                break
         
 
 # =================================================================================================
@@ -59,6 +64,7 @@ def apply_list(master, list_button3):
     
     box_list = []
     x_pos = 35
+    y_pos = 35
 
     list_button3.config(bg = 'light grey', activebackground = 'light grey')
     clear_frame_object(master)
@@ -68,8 +74,11 @@ def apply_list(master, list_button3):
         if index > 0:
             box_temp = box_list[index - 1]
             x_pos += int(box_temp.cget('width'))
+            if x_pos >= 680:
+                x_pos = 35
+                y_pos += 50
 
-        box_list.append(box(master, Inp.given_input[index], x_pos, 125))
+        box_list.append(box(master, Inp.given_input[index], x_pos, y_pos))
 
     for single_box in box_list:
         single_box.sliding_frame()

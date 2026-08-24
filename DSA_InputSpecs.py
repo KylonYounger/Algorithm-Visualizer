@@ -21,6 +21,7 @@ import random as ran
 def Input_Def(master, x, list_button3):
     global given_input
     given_input = []
+
     match x:
         case 0:
             # LIST FACTS: 
@@ -78,11 +79,24 @@ def Input_Def(master, x, list_button3):
             list_box_val.bind("<Return>", lambda e: list_change_index(int(list_box_val.get()), list_box_val.get(), list_button3))
 
         case 1:
-            pass
+            # store data values in key:value pairs
+            # Ordered
+            # Changeable
+            # NO duplicates
+
+            dic_label_1 = tk.Label(master, text = 'Dictionary Input: ')
+            dic_label_1.place(anchor= 'nw', x = -10, y = -10)
+
+            dic_bullet = tk.Label(master, bd = 1, text = "Dictionaries have:\n - Key:Value Pairs \n - Is ordered \n - Changeable data \n - No Duplicates", relief = 'solid')
+            dic_bullet.place(anchor = 'nw', x = 320, y = 85)
+
+
+
     
     return None
 
 # =================================================================================================
+
 
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
