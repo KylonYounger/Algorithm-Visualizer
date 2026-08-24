@@ -227,8 +227,10 @@ def main():
     # Dev tool for tab 2 input setup
     root.bind("<asciitilde>", lambda event: helper_window(event, notebook_frame_2))
 
+    
+
     global list_button3
-    list_button3 = tk.Button(root, command = lambda: dis.apply_list(main_panel, list_button3), text = 'apply', state = 'disabled')
+    list_button3 = tk.Button(root, command = lambda: dis.apply_list(main_panel, list_button3, ), text = 'apply', state = 'disabled')
     list_button3.place(anchor = 'nw', x = 728, y = 277)
 
     # Label for notebook frame

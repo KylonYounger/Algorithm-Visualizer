@@ -30,6 +30,7 @@ def Input_Def(master, x, list_button3):
             # can change, add, remove after created
             # is ordered
 
+
             list_label = tk.Label(master, text = "List Input: ")
             list_label.place(anchor = 'nw', x = 0, y = -10)
 

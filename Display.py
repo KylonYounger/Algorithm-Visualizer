@@ -27,6 +27,7 @@ class box(tk.Frame):
     def __init__(self, master, label, x_pos, y_pos):
         super().__init__(master, width = BOX_WIDTH, height = BOX_HEIGHT, relief = BOX_RELIEF, bd = 10)
 
+        self.label = label
         self.y_mov_s = 0
         self.fin_pos = y_pos
         self.x_fin = x_pos
@@ -52,6 +53,20 @@ class box(tk.Frame):
         
 
 # =================================================================================================
+
+# BOX INHERITANCE CLASS, will use the box class to create a NODE object.
+# This will just be a standard box with a value and "pointer" to the next object
+# Pointer can be an arrow or it might be the next values number?
+class node_box(box):
+    def __init__(self, master, label, x_pos, y_pos, next = None, prev = None):
+        super.__init__(self, master, label, x_pos, y_pos)
+
+        self.next_ptr = next
+        self.prev_ptr = prev
+
+        if next.label is not None:
+            self.label += "->" + next.label
+
 
 
 
