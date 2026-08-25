@@ -76,7 +76,7 @@ class node_box(box):
 #   Returns - None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 def apply_list(master, list_button3):
-    
+    input_obj = Inp.get_input_obj()
     box_list = []
     x_pos = 35
     y_pos = 35
@@ -85,7 +85,7 @@ def apply_list(master, list_button3):
     clear_frame_object(master)
     # UPDATE Canvas
 
-    for index in range(0, len(Inp.given_input)):
+    for index in range(0, len(input_obj)):
         if index > 0:
             box_temp = box_list[index - 1]
             x_pos += int(box_temp.cget('width'))
@@ -93,7 +93,7 @@ def apply_list(master, list_button3):
                 x_pos = 35
                 y_pos += 50
 
-        box_list.append(box(master, Inp.given_input[index], x_pos, y_pos))
+        box_list.append(box(master, input_obj[index], x_pos, y_pos))
 
     for single_box in box_list:
         single_box.sliding_frame()

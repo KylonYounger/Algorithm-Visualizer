@@ -22,6 +22,80 @@ import Display as dis
 import tkinter as tk
 from tkinter import ttk
 
+'''
+    - Thoughts and ideas
+        "apply list" will soon have to be able to take a class object and apply
+        that to any type of selected tree item. Then either a play button or the
+        apply button will start / reset the animations.
+
+        - Create class that allows the object instance of a Frame with a label. This should be the base
+        class that allows for sub-classes and inheritance to take place.
+
+'''
+BOX_WIDTH = 50
+BOX_HEIGHT = 50
+BOX_RELIEF = 'raised'
+
+
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+# - Class for Display box
+#   - Uses 
+#   - Inherites from Frame 
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+class box(tk.Frame):
+    all_boxes = []
+
+    def __init__(self, master, label, x_pos, y_pos):
+        super().__init__(master, width = BOX_WIDTH, height = BOX_HEIGHT, relief = BOX_RELIEF, bd = 10)
+
+        self.label = label
+        self.y_mov_s = 0
+        self.fin_pos = y_pos
+        self.x_fin = x_pos
+
+        if len(str(label)) >= 5:
+            self.config(width = BOX_WIDTH + ((len(str(label))) * 5))
+            
+        self.box_label = tk.Label(self, text = label)
+        self.box_label.place(anchor = 's', relx = .5, rely = 0.9) # CENTER OF BOX_TEMP
+
+    # Animation for the insert of a new block
+    def sliding_frame(self):
+        self.place(x = self.x_fin)
+        fac = (self.fin_pos - 35) / 100
+        print(fac)
+        while(True):
+            if self.y_mov_s <= self.fin_pos:
+                self.y_mov_s += (0.01 + fac)
+                self.place(y = self.y_mov_s)
+                self.update()
+            else:
+                break
+        
+
+# =================================================================================================
+
+# BOX INHERITANCE CLASS, will use the box class to create a NODE object.
+# This will just be a standard box with a value and "pointer" to the next object
+# Pointer can be an arrow or it might be the next values number?
+class node_box(box):
+    def __init__(self, master, label, x_pos, y_pos, next = None, prev = None):
+        super.__init__(self, master, label, x_pos, y_pos)
+
+        self.next_ptr = next
+        self.prev_ptr = prev
+
+        if next.label is not None:
+            self.label += "->" + next.label
+
+# =================================================================================================
+
+
+
+
+
+
+
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Clears any given widget of its children
 #   Returns - None
@@ -33,6 +107,37 @@ def clear_frame(frame):
 
 # =================================================================================================
 
+
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+# - Places Frames into canvas with Label corrasponding to the list integer
+#   - GLOBAL PARAM = given_input   (Gets defined in selected())
+#   Returns - None
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+def apply_list(master, list_button3):
+    input_obj = get_input_obj()
+    box_list = []
+    x_pos = 35
+    y_pos = 35
+
+    list_button3.config(bg = 'light grey', activebackground = 'light grey')
+    clear_frame(master)
+    # UPDATE Canvas
+
+    for index in range(0, len(input_obj)):
+        if index > 0:
+            box_temp = box_list[index - 1]
+            x_pos += int(box_temp.cget('width'))
+            if x_pos >= 680:
+                x_pos = 35
+                y_pos += 50
+
+        box_list.append(box(master, input_obj[index], x_pos, y_pos))
+
+    for single_box in box_list:
+        single_box.sliding_frame()
+
+
+# =================================================================================================
 
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -77,8 +182,16 @@ def selected(event):
     if matcher_dic.get(string['text']) is not None:
         clear_frame(main_panel)
         list_button3.config(state = 'active')
+
+
+
+
+        # MASSIVE CHANGE HERE
+        # Input_Def is only being called when we select the tree item..
+        # This needs to happen evertime we call apply the input obj needs to get updated
         Input_Def(notebook_frame_2, matcher_dic.get(string['text']), list_button3)
 
+        
     return None
 
 # =================================================================================================
@@ -130,6 +243,15 @@ def apply_new_pos(e, pos_x, pos_y, child_box, child_list):
         child = child_list[index]
         child.place(x = pos_x, y = pos_y)
         print(pos_x, pos_y)
+
+
+
+
+
+
+
+
+
 
 
 
@@ -227,10 +349,8 @@ def main():
     # Dev tool for tab 2 input setup
     root.bind("<asciitilde>", lambda event: helper_window(event, notebook_frame_2))
 
-    
-
     global list_button3
-    list_button3 = tk.Button(root, command = lambda: dis.apply_list(main_panel, list_button3, ), text = 'apply', state = 'disabled')
+    list_button3 = tk.Button(root, command = lambda: dis.apply_list(main_panel, list_button3), text = 'apply', state = 'disabled')
     list_button3.place(anchor = 'nw', x = 728, y = 277)
 
     # Label for notebook frame
@@ -290,10 +410,6 @@ def main():
 
 
 
-
-
-
-
     # =================================================================================================
     # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     
@@ -341,8 +457,6 @@ def main():
     tree.insert(parent = '', index = 3, iid = 3, text = "Sorting Algorithms")
     tree.insert(parent = '3', index = 0, text = "Item 1")
 
-
-
     # =================================================================================================
 
     root.mainloop()
@@ -350,49 +464,3 @@ if __name__ == "__main__":#
     main()
 
 # END
-
-
-
-
-
-# Font viewer to copy and change font
-"""
-    # Source - https://stackoverflow.com/a/53717785
-    # Posted by jimmiesrustled, modified by community. See post 'Timeline' for change history
-    # Retrieved 2026-07-21, License - CC BY-SA 4.0
-
-    root.title('Font Families')
-    fonts=list(font.families())
-    fonts.sort()
-
-    def populate(frame):
-        '''Put in the fonts'''
-        listnumber = 1
-        for i, item in enumerate(fonts):
-            label = "listlabel" + str(listnumber)
-            label = tk.Label(frame,text=item,font=(item, 16))
-            label.grid(row=i)
-            label.bind("<Button-1>",lambda e,item=item:copy_to_clipboard(item))
-            listnumber += 1
-
-    def copy_to_clipboard(item):
-        root.clipboard_clear()
-        root.clipboard_append("font=('" + item.lstrip('@') + "', 12)")
-
-    def onFrameConfigure(canvas):
-        '''Reset the scroll region to encompass the inner frame'''
-        canvas.configure(scrollregion=canvas.bbox("all"))
-
-    canvas = tk.Canvas(root, borderwidth=0, background="#ffffff")
-    frame = tk.Frame(canvas, background="#ffffff")
-    vsb = tk.Scrollbar(root, orient="vertical", command=canvas.yview)
-    canvas.configure(yscrollcommand=vsb.set)
-
-    vsb.pack(side="right", fill="y")
-    canvas.pack(side="left", fill="both", expand=True)
-    canvas.create_window((4,4), window=frame, anchor="nw")
-
-    frame.bind("<Configure>", lambda event, canvas=canvas: onFrameConfigure(canvas))
-
-    populate(frame)
-"""

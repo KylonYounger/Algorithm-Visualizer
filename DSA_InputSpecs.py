@@ -1,6 +1,9 @@
 import tkinter as tk
 import random as ran
 
+global input_obj
+input_obj = None
+
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # - Sets up input frame for notebook tab 2.
 # - This can be anything for each TreeView item.
@@ -19,8 +22,7 @@ import random as ran
 #    Done: - None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 def Input_Def(master, x, list_button3):
-    global given_input
-    given_input = []
+    global input_obj
 
     match x:
         case 0:
@@ -29,7 +31,7 @@ def Input_Def(master, x, list_button3):
             # can have duplicates
             # can change, add, remove after created
             # is ordered
-
+            input_obj = []
 
             list_label = tk.Label(master, text = "List Input: ")
             list_label.place(anchor = 'nw', x = 0, y = -10)
@@ -37,10 +39,10 @@ def Input_Def(master, x, list_button3):
             list_label2 = tk.Label(master, text = "Please type in a list of data seperated by a comma and press enter:", wraplength = 300, justify = 'left', relief = 'solid', bd = 1)
             list_label2.place(anchor = 'nw', x = 0, y = 9)
 
-            list_Button = tk.Button(master, text = 'add random integer', command = lambda: list_add_rand(list_button3))
+            list_Button = tk.Button(master, text = 'add random integer', command = lambda: list_add_rand(input_obj, list_button3))
             list_Button.place(anchor = 'nw', x = 315, y = 0)
 
-            list_Button = tk.Button(master, text = 'remove end', command = lambda: list_remove_end(list_button3))
+            list_Button = tk.Button(master, text = 'remove end', command = lambda: list_remove_end(input_obj, list_button3))
             list_Button.place(anchor = 'nw', x = 315, y = 26)
 
             list_change = tk.Label(master, bd = 1, text = "Change the list value at the specific index: \n(0 is the starting number)", relief = 'solid')
@@ -75,9 +77,9 @@ def Input_Def(master, x, list_button3):
             list_box_val = tk.Entry(master, bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
             list_box_val.place(anchor = 'nw', x = 0, y = 130)
 
-            list_box.bind("<Return>", lambda e: val_ent(e, list_button3))
-            list_box_index.bind("<Return>", lambda e: list_change_index(int(list_box_index.get()),list_box_val.get(), list_button3))
-            list_box_val.bind("<Return>", lambda e: list_change_index(int(list_box_val.get()), list_box_val.get(), list_button3))
+            list_box.bind("<Return>", lambda e: val_ent(e, input_obj, list_button3))
+            list_box_index.bind("<Return>", lambda e: list_change_index(int(list_box_index.get()),list_box_val.get(), list_button3, input_obj))
+            list_box_val.bind("<Return>", lambda e: list_change_index(int(list_box_val.get()), list_box_val.get(), list_button3, input_obj))
 
         case 1:
             # store data values in key:value pairs
@@ -125,23 +127,18 @@ def entry_checker(curr_val):
 #           - Currently Adds integers to list
 #           - Returns None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-def val_ent(e, list_button3):
-    global given_input
+def val_ent(e, input_obj, list_button3):
     list_button3.config(bg = 'pink', activebackground = 'pink')
     val = ''
     if list_box.get() != '':
         val = list_box.get()
 
-    given_input = val.split(',')
-    for x in reversed(given_input):
+    input_obj = val.split(',')
+    for x in reversed(input_obj):
         if x == '':
-            given_input.remove(x)
-    
-    given_input = [x for x in given_input]
+            input_obj.remove(x)
 
     list_box.delete(0, tk.END)
-
-    return None
 
 # =================================================================================================
 
@@ -151,29 +148,35 @@ def val_ent(e, list_button3):
 # - Removes end of given input int list
 #           - Returns None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-def list_remove_end(list_button3):
+def list_remove_end(input_obj, list_button3):
     list_button3.config(bg = 'pink', activebackground = 'pink')
-    if len(given_input) != 0:
-        given_input.pop()
+    if len(input_obj) != 0:
+        input_obj.pop()
 # =================================================================================================
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # - adds to the end of given input int list a random number 0 - 100
 #           - Returns None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-def list_add_rand(list_button3):
+def list_add_rand(input_obj, list_button3):
     list_button3.config(bg = 'pink', activebackground = 'pink')
     x = str(ran.randint(0,100))
-    given_input.append(x) # type: ignore
+    input_obj.append(x) # type: ignore
 
 # =================================================================================================
 
-def list_change_index(x, new_num, list_button3):
-    if x <= len(given_input):
+def list_change_index(x, new_num, list_button3, input_obj):
+    if x <= len(input_obj):
         list_button3.config(bg = 'pink', activebackground = 'pink')
-        given_input[x] = new_num
+        input_obj[x] = new_num
         list_box_index.delete(0, tk.END)
         list_box_val.delete(0, tk.END)
     else:
         # place label for bad index of change location!
         pass
+
+
+def get_input_obj():
+    if input_obj is not None:
+        return input_obj
+    return None
