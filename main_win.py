@@ -18,20 +18,10 @@
 # ============================================================================================
 import DSA_descriptions as des
 from DSA_InputSpecs import *
-import Display as dis
 import tkinter as tk
 from tkinter import ttk
 
-'''
-    - Thoughts and ideas
-        "apply list" will soon have to be able to take a class object and apply
-        that to any type of selected tree item. Then either a play button or the
-        apply button will start / reset the animations.
 
-        - Create class that allows the object instance of a Frame with a label. This should be the base
-        class that allows for sub-classes and inheritance to take place.
-
-'''
 BOX_WIDTH = 50
 BOX_HEIGHT = 50
 BOX_RELIEF = 'raised'
@@ -63,7 +53,6 @@ class box(tk.Frame):
     def sliding_frame(self):
         self.place(x = self.x_fin)
         fac = (self.fin_pos - 35) / 100
-        print(fac)
         while(True):
             if self.y_mov_s <= self.fin_pos:
                 self.y_mov_s += (0.01 + fac)
@@ -80,13 +69,13 @@ class box(tk.Frame):
 # Pointer can be an arrow or it might be the next values number?
 class node_box(box):
     def __init__(self, master, label, x_pos, y_pos, next = None, prev = None):
-        super.__init__(self, master, label, x_pos, y_pos)
+        #super.__init__(self, master, label, x_pos, y_pos)
 
         self.next_ptr = next
         self.prev_ptr = prev
 
-        if next.label is not None:
-            self.label += "->" + next.label
+        #if next.label is not None:
+        #    self.label += "->" + next.label
 
 # =================================================================================================
 
@@ -108,13 +97,15 @@ def clear_frame(frame):
 # =================================================================================================
 
 
+
+
+
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # - Places Frames into canvas with Label corrasponding to the list integer
 #   - GLOBAL PARAM = given_input   (Gets defined in selected())
 #   Returns - None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 def apply_list(master, list_button3):
-    input_obj = get_input_obj()
     box_list = []
     x_pos = 35
     y_pos = 35
@@ -123,15 +114,31 @@ def apply_list(master, list_button3):
     clear_frame(master)
     # UPDATE Canvas
 
-    for index in range(0, len(input_obj)):
-        if index > 0:
-            box_temp = box_list[index - 1]
-            x_pos += int(box_temp.cget('width'))
-            if x_pos >= 680:
-                x_pos = 35
-                y_pos += 50
+    input_obj = get_input_obj()
+    if input_obj is not None and type(input_obj) == list:
+        for index in range(0, len(input_obj)):
+            if index > 0:
+                box_temp = box_list[index - 1]
+                x_pos += int(box_temp.cget('width'))
+                if x_pos >= 680:
+                    x_pos = 35
+                    y_pos += 50
 
-        box_list.append(box(master, input_obj[index], x_pos, y_pos))
+            box_list.append(box(master, input_obj[index], x_pos, y_pos))
+
+    if input_obj is not None and type(input_obj) == dict:
+            temp_list = []
+            for x in input_obj:
+                temp_list.append(x)
+            for index in range(0, len(input_obj)):
+                if index > 0:
+                    box_temp = box_list[index - 1]
+                    x_pos += int(box_temp.cget('width'))
+                    if x_pos >= 680:
+                        x_pos = 35
+                        y_pos += 50
+                temp_str = str("{ " + temp_list[index] + " : " + str(input_obj.get(temp_list[index])) + " }")
+                box_list.append(box(master, temp_str, x_pos, y_pos))
 
     for single_box in box_list:
         single_box.sliding_frame()
@@ -152,7 +159,7 @@ def apply_list(master, list_button3):
 #          - Returns None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-def selected(event):
+def selected(event, input_obj):
     # Sets main planels lable with tree selected item
     var_label = tree.selection()
     string = tree.item(var_label[0])
@@ -230,8 +237,15 @@ def helper_window(e, widget):
 
         # Passes the box list and tuple of widget children that can be accessed
         helper.bind('<Return>', lambda e: apply_new_pos(e, ent_x.get(), ent_y.get(), child_list_box, child_list))
+        global temp_dic
+        temp_dic = {}
+        helper.protocol("WM_DELETE_WINDOW", lambda: on_close(helper, temp_dic))
 
 
+def on_close(helper, temp_dic):
+    if temp_dic is not None:
+        print(temp_dic)
+    helper.destroy()
 
 
 def apply_new_pos(e, pos_x, pos_y, child_box, child_list):
@@ -242,16 +256,8 @@ def apply_new_pos(e, pos_x, pos_y, child_box, child_list):
         # Changes selected widget x and y pos
         child = child_list[index]
         child.place(x = pos_x, y = pos_y)
-        print(pos_x, pos_y)
-
-
-
-
-
-
-
-
-
+        temp_str = str(pos_x) + " " + str(pos_y)
+        temp_dic.update({str(child) + " :": temp_str})
 
 
 
@@ -277,7 +283,7 @@ def main():
 
     # =================================================================================================
 
-
+    input_obj = None
 
 
 
@@ -350,7 +356,7 @@ def main():
     root.bind("<asciitilde>", lambda event: helper_window(event, notebook_frame_2))
 
     global list_button3
-    list_button3 = tk.Button(root, command = lambda: dis.apply_list(main_panel, list_button3), text = 'apply', state = 'disabled')
+    list_button3 = tk.Button(root, command = lambda: apply_list(main_panel, list_button3), text = 'apply', state = 'disabled')
     list_button3.place(anchor = 'nw', x = 728, y = 277)
 
     # Label for notebook frame
@@ -386,8 +392,9 @@ def main():
     tree.place(relx = 0.01, rely = 0.999, anchor = 'nw', width = 275, y = -110, x = -10)
 
     # Mouse double left click for tree widget and enter too select the tree
-    tree.bind("<Double-1>", selected)
-    tree.bind("<Return>", selected)
+    tree.bind("<Double-1>", lambda event : selected(event, input_obj))
+    tree.bind("<Return>", lambda event : selected(event, input_obj))
+
 
     # Tree Scroll Bar - Needs improvement..
     tree_scroll_bar = tk.Scrollbar(tree, orient = 'vertical')
