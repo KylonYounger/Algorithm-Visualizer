@@ -64,6 +64,7 @@ class box(tk.Frame):
 
 # =================================================================================================
 
+
 # BOX INHERITANCE CLASS, will use the box class to create a NODE object.
 # This will just be a standard box with a value and "pointer" to the next object
 # Pointer can be an arrow or it might be the next values number?
@@ -81,10 +82,6 @@ class node_box(box):
 
 
 
-
-
-
-
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # Clears any given widget of its children
 #   Returns - None
@@ -98,19 +95,18 @@ def clear_frame(frame):
 
 
 
-
-
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # - Places Frames into canvas with Label corrasponding to the list integer
 #   - GLOBAL PARAM = given_input   (Gets defined in selected())
 #   Returns - None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-def apply_list(master, list_button3):
+def apply_list(master, apply_button):
+    apply_button.config(state = 'disabled')
     box_list = []
     x_pos = 35
     y_pos = 35
 
-    list_button3.config(bg = 'light grey', activebackground = 'light grey')
+    apply_button.config(bg = 'light grey', activebackground = 'light grey')
     clear_frame(master)
     # UPDATE Canvas
 
@@ -140,11 +136,23 @@ def apply_list(master, list_button3):
                 temp_str = str("{ " + temp_list[index] + " : " + str(input_obj.get(temp_list[index])) + " }")
                 box_list.append(box(master, temp_str, x_pos, y_pos))
 
+    if input_obj is not None and type(input_obj) == tuple:
+            for index in range(0, len(input_obj)):
+                if index > 0:
+                    box_temp = box_list[index - 1]
+                    x_pos += int(box_temp.cget('width'))
+                    if x_pos >= 680:
+                        x_pos = 35
+                        y_pos += 50
+
+                box_list.append(box(master, input_obj[index], x_pos, y_pos))
+
     for single_box in box_list:
         single_box.sliding_frame()
-
+    apply_button.config(state = 'active')
 
 # =================================================================================================
+
 
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -159,7 +167,7 @@ def apply_list(master, list_button3):
 #          - Returns None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-def selected(event, input_obj):
+def selected(event):
     # Sets main planels lable with tree selected item
     var_label = tree.selection()
     string = tree.item(var_label[0])
@@ -168,7 +176,7 @@ def selected(event, input_obj):
     Note_B_label.config(state = 'normal')
 
     # Add much of existing DSAs to diction  : TODO
-    matcher_dic = {"List": 0, "Dictionary": 1}
+    matcher_dic = {"List": 0, "Dictionary": 1, "Tuples": 2, "Set": 3}
 
     Note_B_label.delete(0.0, tk.END)
 
@@ -188,15 +196,11 @@ def selected(event, input_obj):
     
     if matcher_dic.get(string['text']) is not None:
         clear_frame(main_panel)
-        list_button3.config(state = 'active')
+        apply_button.config(state = 'active')
 
-
-
-
-        # MASSIVE CHANGE HERE
-        # Input_Def is only being called when we select the tree item..
-        # This needs to happen evertime we call apply the input obj needs to get updated
-        Input_Def(notebook_frame_2, matcher_dic.get(string['text']), list_button3)
+        # Passes the index of matcher_dic for match statement
+        # list_button3 is the apply button
+        Input_Def(notebook_frame_2, matcher_dic.get(string['text']), apply_button)
 
         
     return None
@@ -205,49 +209,67 @@ def selected(event, input_obj):
 
 
 
-
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+# - helper_window creates new window that gets the passed widget children and lists them to be
+#   to be selected and passed to other functions.
+#   Returns - None
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 def helper_window(e, widget):
     # only if ~ is pressed creates new window
     if e.char == "~":
+        
+        # New window
         helper = tk.Tk()
-
+        
+        # LABELS
         label = tk.Label(helper, text = 'Dev tool for notebook Tab 2')
         label.pack()
-        # Entry box for x pos
+        
         label_x = tk.Label(helper, text = 'x position of wiget')
         label_x.pack()
-        ent_x = tk.Entry(helper, bd = 1)
-        ent_x.pack()
-        # Entry box for y pos
+        
         label_y = tk.Label(helper, text = 'y position of wiget')
         label_y.pack()
+        
+        box_label = tk.Label(helper, text = 'List of Child widgets')
+        box_label.pack()
+
+        # ENTRY
         ent_y = tk.Entry(helper, bd = 1)
         ent_y.pack()
+        
+        ent_x = tk.Entry(helper, bd = 1)
+        ent_x.pack()
 
         # sets list box with a list of all child widgets of current selected DSA in treeview
         child_list_box = tk.Listbox(helper)
         for item in widget.winfo_children():
             child_list_box.insert(tk.END, item)
 
-        box_label = tk.Label(helper, text = 'List of Child widgets')
-        box_label.pack()
-
         child_list_box.pack()
         child_list = widget.winfo_children()
 
         # Passes the box list and tuple of widget children that can be accessed
         helper.bind('<Return>', lambda e: apply_new_pos(e, ent_x.get(), ent_y.get(), child_list_box, child_list))
+
+        # Sets dict for printing after the helper window closes
         global temp_dic
         temp_dic = {}
         helper.protocol("WM_DELETE_WINDOW", lambda: on_close(helper, temp_dic))
 
+# =================================================================================================
 
+
+# on_close prints the last dictionary values added or changed
 def on_close(helper, temp_dic):
     if temp_dic is not None:
         print(temp_dic)
     helper.destroy()
+# =================================================================================================
 
 
+# Applies the new x and y pos of the selected child widget in the widget box
+# updates the dictionary to print last x y values
 def apply_new_pos(e, pos_x, pos_y, child_box, child_list):
     # Sets the selected list box children with the entry box numbers
     selection = child_box.curselection()
@@ -258,6 +280,7 @@ def apply_new_pos(e, pos_x, pos_y, child_box, child_list):
         child.place(x = pos_x, y = pos_y)
         temp_str = str(pos_x) + " " + str(pos_y)
         temp_dic.update({str(child) + " :": temp_str})
+# =================================================================================================
 
 
 
@@ -283,9 +306,6 @@ def main():
 
     # =================================================================================================
 
-    input_obj = None
-
-
 
 
     # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -294,13 +314,17 @@ def main():
 
     # Main Panel to allow images and animations.
     global main_panel
-    main_panel = tk.Canvas(root, bd = 10, bg = 'dark grey', relief = 'sunken', width = 760, height = 290)
+    main_panel = tk.Canvas(root, bd = 10, bg = 'dark grey', relief = 'sunken', width = 760, height = 800, scrollregion = (0, 0, 2000, 2000))
     main_panel.pack()
+    main_panel.bbox("all")
 
-    # =================================================================================================
-
+    main_canvas_scroll = tk.Scrollbar(root, orient = 'vertical', command = main_panel.yview)
+    main_panel.config(yscrollcommand = main_canvas_scroll.set)
+    main_canvas_scroll.place(relx = 0.9, rely = 0.2, relheight = 1)
     
-
+    # =================================================================================================
+    
+   
 
     # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     # Label Display
@@ -315,9 +339,6 @@ def main():
 
     
 
-
-
-
     # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     # FRAME for Notebook and TreeView
     # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -327,12 +348,6 @@ def main():
     frame.place(relx = 0.5, rely = 1.0, anchor = 's', relwidth = .99)
 
     # =================================================================================================
-
-
-
-
-
-
 
 
 
@@ -355,9 +370,9 @@ def main():
     # Dev tool for tab 2 input setup
     root.bind("<asciitilde>", lambda event: helper_window(event, notebook_frame_2))
 
-    global list_button3
-    list_button3 = tk.Button(root, command = lambda: apply_list(main_panel, list_button3), text = 'apply', state = 'disabled')
-    list_button3.place(anchor = 'nw', x = 728, y = 277)
+    global apply_button
+    apply_button = tk.Button(root, command = lambda: apply_list(main_panel, apply_button), text = 'apply', state = 'disabled')
+    apply_button.place(anchor = 'nw', x = 728, y = 277)
 
     # Label for notebook frame
     global Note_B_label
@@ -377,11 +392,6 @@ def main():
 
 
 
-
-
-
-
-
     # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     # TREE Display
     # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -392,8 +402,8 @@ def main():
     tree.place(relx = 0.01, rely = 0.999, anchor = 'nw', width = 275, y = -110, x = -10)
 
     # Mouse double left click for tree widget and enter too select the tree
-    tree.bind("<Double-1>", lambda event : selected(event, input_obj))
-    tree.bind("<Return>", lambda event : selected(event, input_obj))
+    tree.bind("<Double-1>", lambda event : selected(event))
+    tree.bind("<Return>", lambda event : selected(event))
 
 
     # Tree Scroll Bar - Needs improvement..
@@ -407,13 +417,6 @@ def main():
     display_frame_lable.pack()
 
     # =================================================================================================
-
-
-
-
-
-
-
 
 
 

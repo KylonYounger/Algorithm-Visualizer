@@ -23,5 +23,28 @@ def DSA_des_index(x):
     value of a item is through its' key and with duplicated keys, you will have duplicated values.
 
     Ex: my_diction = {key: value, 13: "apple"}
-    """}
+    """,
+    2:
+    """Tuples -
+    - A tuple allows to store multiple items in a single variable.\n\
+    - Tuple items are ordered, unchangable meaning after creation the data cannot be changed and tuples are allow duplicate values.
+    \n- Tuples can have multiple data types.
+    
+    Ex: my_tuple = (1, 2, True, 4, "apple", "apple")
+    """,
+    3:
+    """Sets -
+    - Sets are used to store multiple items in a single variable.\n\
+    - Sets are unorderd meaning everytime a set is used the items in the set\n\
+        are placed randomly and cannot be refered to be index or key.\n\
+    - Sets cannot have duplicate values.\n\
+    - Sets are unchangeable, meaning after adding or removing you cannot change the values\
+        inside the set.\n\
+    - Sets can have different data types.
+
+    Ex: my_set = {0, 1, 2, "apple", True}
+    """
+
+    }
+    
     return my_des_dic[x]
