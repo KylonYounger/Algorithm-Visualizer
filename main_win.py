@@ -39,9 +39,10 @@ class box(tk.Frame):
         super().__init__(master, width = BOX_WIDTH, height = BOX_HEIGHT, relief = BOX_RELIEF, bd = 10)
 
         self.label = label
-        self.y_mov_s = 0
-        self.fin_pos = y_pos
-        self.x_fin = x_pos
+        self.fin_x = x_pos
+        self.fin_y = y_pos
+        
+        self.canvas_id = main_panel.create_window(x_pos, -65, window = self, anchor = 'nw')
 
         if len(str(label)) >= 5:
             self.config(width = BOX_WIDTH + ((len(str(label))) * 5))
@@ -51,16 +52,12 @@ class box(tk.Frame):
 
     # Animation for the insert of a new block
     def sliding_frame(self):
-        self.place(x = self.x_fin)
-        fac = (self.fin_pos - 35) / 100
-        while(True):
-            if self.y_mov_s <= self.fin_pos:
-                self.y_mov_s += (0.01 + fac)
-                self.place(y = self.y_mov_s)
-                self.update()
-            else:
-                break
-        
+        inc_factor = 1 + (self.fin_x - 35) // 50
+        x = 0
+        while(x <= self.fin_y):
+            x += 1
+            main_panel.move(self.canvas_id, 0, 1)
+            self.update()
 
 # =================================================================================================
 
@@ -104,7 +101,7 @@ def apply_list(master, apply_button):
     apply_button.config(state = 'disabled')
     box_list = []
     x_pos = 35
-    y_pos = 35
+    y_pos = 100
 
     apply_button.config(bg = 'light grey', activebackground = 'light grey')
     clear_frame(master)
@@ -121,6 +118,7 @@ def apply_list(master, apply_button):
                     y_pos += 50
 
             box_list.append(box(master, input_obj[index], x_pos, y_pos))
+            main_panel.configure(scrollregion = (0, 0, 1, y_pos + 10))
 
     if input_obj is not None and type(input_obj) == dict:
             temp_list = []
@@ -135,6 +133,7 @@ def apply_list(master, apply_button):
                         y_pos += 50
                 temp_str = str("{ " + temp_list[index] + " : " + str(input_obj.get(temp_list[index])) + " }")
                 box_list.append(box(master, temp_str, x_pos, y_pos))
+                main_panel.configure(scrollregion = (0, 0, 1, y_pos + 10))
 
     if input_obj is not None and type(input_obj) == tuple:
             for index in range(0, len(input_obj)):
@@ -146,7 +145,10 @@ def apply_list(master, apply_button):
                         y_pos += 50
 
                 box_list.append(box(master, input_obj[index], x_pos, y_pos))
-
+                main_panel.configure(scrollregion = (0, 0, 1, y_pos + 10))
+                
+    #for single_box in box_list:
+    #main_panel.create_window(single_box.x_fin, single_box.fin_pos, window = single_box, anchor = 'nw')
     for single_box in box_list:
         single_box.sliding_frame()
     apply_button.config(state = 'active')
@@ -281,8 +283,14 @@ def apply_new_pos(e, pos_x, pos_y, child_box, child_list):
         temp_str = str(pos_x) + " " + str(pos_y)
         temp_dic.update({str(child) + " :": temp_str})
 # =================================================================================================
-
-
+"""
+def on_mouse_wheel(event):
+    if event.delta:
+        main_panel.yview_scroll(int(-1 * (event.delta / 120)), "units")
+    else:
+        if event.num == 4: main_panel.yview_scroll(-1, "units")
+        elif event.num == 5: main_panel.yview_scroll(1, "units")
+"""
 
 
 # =================================================================================================
@@ -311,16 +319,21 @@ def main():
     # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
     # CANVAS for main display of Animations/DSAs
     # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+    container = tk.Frame(root)
+    container.pack(fill = 'both', expand = True)
 
     # Main Panel to allow images and animations.
     global main_panel
-    main_panel = tk.Canvas(root, bd = 10, bg = 'dark grey', relief = 'sunken', width = 760, height = 800, scrollregion = (0, 0, 2000, 2000))
+    main_panel = tk.Canvas(container, bd = 10, bg = 'dark grey', relief = 'sunken', width = 760, height = 285)
     main_panel.pack()
-    main_panel.bbox("all")
 
-    main_canvas_scroll = tk.Scrollbar(root, orient = 'vertical', command = main_panel.yview)
+    #main_panel.bind_all("<MouseWheel>", on_mouse_wheel)
+    #main_panel.bind_all("<Button-4>", on_mouse_wheel)
+    #main_panel.bind_all("<Button-5>", on_mouse_wheel)
+
+    main_canvas_scroll = tk.Scrollbar(container, orient = 'vertical', command = main_panel.yview)
     main_panel.config(yscrollcommand = main_canvas_scroll.set)
-    main_canvas_scroll.place(relx = 0.9, rely = 0.2, relheight = 1)
+    main_canvas_scroll.place(x = 748, y = 15, relheight = 0.47)
     
     # =================================================================================================
     
