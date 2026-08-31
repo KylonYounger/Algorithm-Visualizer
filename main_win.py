@@ -52,12 +52,14 @@ class box(tk.Frame):
 
     # Animation for the insert of a new block
     def sliding_frame(self):
-        inc_factor = 1 + (self.fin_x - 35) // 50
         x = 0
         while(x <= self.fin_y):
             x += 1
             main_panel.move(self.canvas_id, 0, 1)
             self.update()
+    # Directly places blocks at thier coords
+    def place_frame(self):
+        main_panel.coords(self.canvas_id, self.fin_x, self.fin_y - 65)
 
 # =================================================================================================
 
@@ -106,36 +108,12 @@ def apply_list(master, apply_button):
     apply_button.config(bg = 'light grey', activebackground = 'light grey')
     clear_frame(master)
     # UPDATE Canvas
-
+    
     input_obj = get_input_obj()
-    if input_obj is not None and type(input_obj) == list:
-        for index in range(0, len(input_obj)):
-            if index > 0:
-                box_temp = box_list[index - 1]
-                x_pos += int(box_temp.cget('width'))
-                if x_pos >= 680:
-                    x_pos = 35
-                    y_pos += 50
-
-            box_list.append(box(master, input_obj[index], x_pos, y_pos))
-            main_panel.configure(scrollregion = (0, 0, 1, y_pos + 10))
-
-    if input_obj is not None and type(input_obj) == dict:
-            temp_list = []
-            for x in input_obj:
-                temp_list.append(x)
-            for index in range(0, len(input_obj)):
-                if index > 0:
-                    box_temp = box_list[index - 1]
-                    x_pos += int(box_temp.cget('width'))
-                    if x_pos >= 680:
-                        x_pos = 35
-                        y_pos += 50
-                temp_str = str("{ " + temp_list[index] + " : " + str(input_obj.get(temp_list[index])) + " }")
-                box_list.append(box(master, temp_str, x_pos, y_pos))
-                main_panel.configure(scrollregion = (0, 0, 1, y_pos + 10))
-
-    if input_obj is not None and type(input_obj) == tuple:
+    if input_obj == None:
+        return
+    match input_obj:
+        case list():
             for index in range(0, len(input_obj)):
                 if index > 0:
                     box_temp = box_list[index - 1]
@@ -145,12 +123,55 @@ def apply_list(master, apply_button):
                         y_pos += 50
 
                 box_list.append(box(master, input_obj[index], x_pos, y_pos))
-                main_panel.configure(scrollregion = (0, 0, 1, y_pos + 10))
+                main_panel.configure(scrollregion = (0, 0, 1, y_pos + 20))
+
+        case dict():
+                temp_list = []
+                for x in input_obj:
+                    temp_list.append(x)
+                for index in range(0, len(input_obj)):
+                    if index > 0:
+                        box_temp = box_list[index - 1]
+                        x_pos += int(box_temp.cget('width'))
+                        if x_pos >= 680:
+                            x_pos = 35
+                            y_pos += 50
+                    temp_str = str("{ " + temp_list[index] + " : " + str(input_obj.get(temp_list[index])) + " }")
+                    box_list.append(box(master, temp_str, x_pos, y_pos))
+                    main_panel.configure(scrollregion = (0, 0, 1, y_pos + 20))
+
+        case tuple():
+                for index in range(0, len(input_obj)):
+                    if index > 0:
+                        box_temp = box_list[index - 1]
+                        x_pos += int(box_temp.cget('width'))
+                        if x_pos >= 680:
+                            x_pos = 35
+                            y_pos += 50
+
+                    box_list.append(box(master, input_obj[index], x_pos, y_pos))
+                    main_panel.configure(scrollregion = (0, 0, 1, y_pos + 20))
+
+        case set():
+                index = 0
+                for single_item in input_obj:
+                    if index > 0:
+                        box_temp = box_list[index - 1]
+                        x_pos += int(box_temp.cget('width'))
+                        if x_pos >= 680:
+                            x_pos = 35
+                            y_pos += 50
+                    index += 1
+                    box_list.append(box(master, single_item, x_pos, y_pos))
+                    main_panel.configure(scrollregion = (0, 0, 1, y_pos + 20))
                 
-    #for single_box in box_list:
-    #main_panel.create_window(single_box.x_fin, single_box.fin_pos, window = single_box, anchor = 'nw')
+    x = 0
     for single_box in box_list:
-        single_box.sliding_frame()
+        if x <= 64:   # 13, 26, 39, 52, 65
+            single_box.sliding_frame()
+            x += 1
+        else:
+            single_box.place_frame()
     apply_button.config(state = 'active')
 
 # =================================================================================================
@@ -283,14 +304,16 @@ def apply_new_pos(e, pos_x, pos_y, child_box, child_list):
         temp_str = str(pos_x) + " " + str(pos_y)
         temp_dic.update({str(child) + " :": temp_str})
 # =================================================================================================
-"""
+
+
+# Allows canvas mouse wheel to scroll
 def on_mouse_wheel(event):
     if event.delta:
         main_panel.yview_scroll(int(-1 * (event.delta / 120)), "units")
     else:
         if event.num == 4: main_panel.yview_scroll(-1, "units")
         elif event.num == 5: main_panel.yview_scroll(1, "units")
-"""
+# =================================================================================================
 
 
 # =================================================================================================
@@ -327,9 +350,9 @@ def main():
     main_panel = tk.Canvas(container, bd = 10, bg = 'dark grey', relief = 'sunken', width = 760, height = 285)
     main_panel.pack()
 
-    #main_panel.bind_all("<MouseWheel>", on_mouse_wheel)
-    #main_panel.bind_all("<Button-4>", on_mouse_wheel)
-    #main_panel.bind_all("<Button-5>", on_mouse_wheel)
+    main_panel.bind_all("<MouseWheel>", on_mouse_wheel)
+    main_panel.bind_all("<Button-4>", on_mouse_wheel)
+    main_panel.bind_all("<Button-5>", on_mouse_wheel)
 
     main_canvas_scroll = tk.Scrollbar(container, orient = 'vertical', command = main_panel.yview)
     main_panel.config(yscrollcommand = main_canvas_scroll.set)
