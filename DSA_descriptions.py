@@ -43,8 +43,14 @@ def DSA_des_index(x):
     - Sets can have different data types.
 
     Ex: my_set = {0, 1, 2, "apple", True}
-    """
+    """,
+    4:
+    """Frozen Sets - 
+    - Frozen sets are exactly the same as normal sets except you cannot add or remove items.
 
+    - Although frozen sets are the same as sets, frozen sets have it's own methods that allow to return \
+a version of the frozen set that is compaired to another set.
+    """
     }
     
     return my_des_dic[x]

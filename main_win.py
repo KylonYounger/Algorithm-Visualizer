@@ -50,6 +50,7 @@ class box(tk.Frame):
         self.box_label = tk.Label(self, text = label)
         self.box_label.place(anchor = 's', relx = .5, rely = 0.9) # CENTER OF BOX_TEMP
 
+
     # Animation for the insert of a new block
     def sliding_frame(self):
         x = 0
@@ -164,6 +165,18 @@ def apply_list(master, apply_button):
                     index += 1
                     box_list.append(box(master, single_item, x_pos, y_pos))
                     main_panel.configure(scrollregion = (0, 0, 1, y_pos + 20))
+        case frozenset():
+                index = 0
+                for single_item in input_obj:
+                    if index > 0:
+                        box_temp = box_list[index - 1]
+                        x_pos += int(box_temp.cget('width'))
+                        if x_pos >= 680:
+                            x_pos = 35
+                            y_pos += 50
+                    index += 1
+                    box_list.append(box(master, single_item, x_pos, y_pos))
+                    main_panel.configure(scrollregion = (0, 0, 1, y_pos + 20))
                 
     x = 0
     for single_box in box_list:
@@ -199,7 +212,7 @@ def selected(event):
     Note_B_label.config(state = 'normal')
 
     # Add much of existing DSAs to diction  : TODO
-    matcher_dic = {"List": 0, "Dictionary": 1, "Tuples": 2, "Set": 3}
+    matcher_dic = {"List": 0, "Dictionary": 1, "Tuples": 2, "Set": 3, "frozen set": 4}
 
     Note_B_label.delete(0.0, tk.END)
 
@@ -347,7 +360,7 @@ def main():
 
     # Main Panel to allow images and animations.
     global main_panel
-    main_panel = tk.Canvas(container, bd = 10, bg = 'dark grey', relief = 'sunken', width = 760, height = 285)
+    main_panel = tk.Canvas(container, bd = 10, bg = 'dark grey', relief = 'sunken', width = 760, height = 290)
     main_panel.pack()
 
     main_panel.bind_all("<MouseWheel>", on_mouse_wheel)

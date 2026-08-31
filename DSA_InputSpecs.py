@@ -197,6 +197,24 @@ def Input_Def(master, x, apply_button):
 
             set_remove_end = tk.Button(master, text = "Remove random item", command = lambda: remove_end(input_obj, apply_button))
             set_remove_end.place(anchor = 'nw', x = 210, y = 127)
+
+        case 4:
+            input_obj = frozenset()
+            # LABELS
+            general_label.config(text = 'frozen set Input: ')
+            
+            general_bullet.config(text = "Frozen sets:\n - Are unordered \n - Unchangeable \n - No duplicates \n - Immutable")
+            general_bullet.place(anchor = 'nw', x = 338, y = 87)
+
+            fset_input_label = tk.Label(master, wraplength = 400, justify = 'left', text = ' Please type in a set of data seperated by a "," and press enter to create a new frozen set: ', bd = 1, relief = 'solid')
+            fset_input_label.place(anchor = 'nw', x = -3, y = 15)
+            # ENTRY
+            global fset_entry_box
+            fset_entry_box = tk.Entry(master, bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
+            fset_entry_box.place(anchor = 'nw', x = -3, y = 55)
+            fset_entry_box.insert(0, "1,2,True,4")
+            
+            fset_entry_box.bind("<Return>", lambda e: val_ent(e, apply_button, fset_entry_box.get()))
             
     return None
 
@@ -313,12 +331,27 @@ def val_ent(e, apply_button, val):
             input_obj.add(x)
         
         set_entry_box.delete(0, tk.END)
+
+    if type(input_obj) == frozenset:
+        input_obj = frozenset()
+        temp_list = val.split(',')
+        
+        # Check for any additional list unwanteds
+        for x in reversed(temp_list):
+            if x == ',':
+                temp_list.remove(x)
+            if x == '':
+                temp_list.remove(x)
+
+        input_obj = frozenset(temp_list)
+        
+        fset_entry_box.delete(0, tk.END)
 # =================================================================================================
 
 
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-# - Removes end of given input int list
+# - Removes end of given input object
 #           - Returns None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 def remove_end(input_obj, apply_button):
