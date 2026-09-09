@@ -19,6 +19,7 @@ import random as ran
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 def Input_Def(master, x, apply_button):
     global input_obj
+    BUILT_IN_DSA_POS = [35, 100]
 
     general_label = tk.Label(master)
     general_label.place(anchor= 'nw', x = -10, y = -10)
@@ -37,6 +38,7 @@ def Input_Def(master, x, apply_button):
             # can change, add, remove after created
             # is ordered
             input_obj = []
+            set_start_pos(BUILT_IN_DSA_POS)
 
             # LABELS
             general_label.config(text = "List Input: ")
@@ -88,6 +90,7 @@ def Input_Def(master, x, apply_button):
             # Changeable
             # NO duplicates
             input_obj = {}
+            set_start_pos(BUILT_IN_DSA_POS)
 
             # LABELS
             general_label.config(text = 'Dictionary Input: ')
@@ -134,6 +137,7 @@ def Input_Def(master, x, apply_button):
             # Tuple Facts:
             #   Ordered, unchangeable, allowed duplicates
             input_obj = ()
+            set_start_pos(BUILT_IN_DSA_POS)
 
             # LABELS
             general_label.config(text = 'Tuple Input: ')
@@ -175,6 +179,8 @@ def Input_Def(master, x, apply_button):
         case 3:
 
             input_obj = set()
+            set_start_pos(BUILT_IN_DSA_POS)
+            
             # LABELS
             general_label.config(text = 'Set Input: ')
             
@@ -200,6 +206,7 @@ def Input_Def(master, x, apply_button):
 
         case 4:
             input_obj = frozenset()
+            set_start_pos(BUILT_IN_DSA_POS)
             # LABELS
             general_label.config(text = 'frozen set Input: ')
             
@@ -483,4 +490,22 @@ def get_input_obj():
     if input_obj is not None:
         return input_obj
     return None
+# =================================================================================================
+
+
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+# - sets starting x and y pos for the DSA
+# - Returns list of x and y
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+def set_start_pos(list):
+    global pos_list
+    pos_list = [] + list
+# =================================================================================================
+
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+# - Gets starting x and y pos for the DSA
+# - Returns list of x and y
+# = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+def get_start_pos():
+    return pos_list
 # =================================================================================================

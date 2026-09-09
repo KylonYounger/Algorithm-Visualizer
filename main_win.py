@@ -5,6 +5,9 @@
 # to visualy see animations and graphs of algorithms and their runtimes. 
 # This project allows me to get a great understanding of larger projects, 
 # data structures, algorithms, git and github, and frontend user interaction.
+# Version 0.1.0 9/6/2026
+# -- All python built-in data structures implimented (Lists, dict, Sets/Frozen sets, tuples)
+# -- Scrolling implimented
 # ============================================================================================
 #
 # ============================================================================================
@@ -42,6 +45,7 @@ class box(tk.Frame):
         self.fin_x = x_pos
         self.fin_y = y_pos
         
+        
         self.canvas_id = main_panel.create_window(x_pos, -65, window = self, anchor = 'nw')
 
         if len(str(label)) >= 5:
@@ -58,9 +62,35 @@ class box(tk.Frame):
             x += 1
             main_panel.move(self.canvas_id, 0, 1)
             self.update()
+
+    def move_after_place(self, new_x, new_y):
+        curr_pos = main_panel.coords(self.canvas_id)
+        x = curr_pos[0]
+        y = curr_pos[1]
+        x_chng = 0
+        y_chng = 0
+        if x < new_x and y < new_y:
+            x_chng = 1
+            y_chng = 1
+        if x < new_x and y > new_y:
+            x_chng = 1
+            y_chng = -1
+        if x > new_x and y < new_y:
+            x_chng = -1
+            y_chng = 1
+        if x > new_x and y > new_y:
+            x_chng = -1
+            y_chng = -1
+        while(x != new_x and y != new_y):
+            x += x_chng
+            y += y_chng
+            main_panel.move(self.canvas_id, x_chng, y_chng)
+        
+            
     # Directly places blocks at thier coords
     def place_frame(self):
         main_panel.coords(self.canvas_id, self.fin_x, self.fin_y - 65)
+        self.update()
 
 # =================================================================================================
 
@@ -68,6 +98,7 @@ class box(tk.Frame):
 # BOX INHERITANCE CLASS, will use the box class to create a NODE object.
 # This will just be a standard box with a value and "pointer" to the next object
 # Pointer can be an arrow or it might be the next values number?
+# Creates line and arrow to box it is linked to?
 class node_box(box):
     def __init__(self, master, label, x_pos, y_pos, next = None, prev = None):
         #super.__init__(self, master, label, x_pos, y_pos)
@@ -103,8 +134,9 @@ def clear_frame(frame):
 def apply_list(master, apply_button):
     apply_button.config(state = 'disabled')
     box_list = []
-    x_pos = 35
-    y_pos = 100
+    pos = get_start_pos()
+    x_pos = pos[0]
+    y_pos = pos[1]
 
     apply_button.config(bg = 'light grey', activebackground = 'light grey')
     clear_frame(master)
@@ -114,12 +146,12 @@ def apply_list(master, apply_button):
     if input_obj == None:
         return
     match input_obj:
-        case list():
+        case list() | tuple():
             for index in range(0, len(input_obj)):
                 if index > 0:
                     box_temp = box_list[index - 1]
                     x_pos += int(box_temp.cget('width'))
-                    if x_pos >= 680:
+                    if x_pos >= 680: # Width threshold of new Line once certain x_pos on canvas
                         x_pos = 35
                         y_pos += 50
 
@@ -134,57 +166,37 @@ def apply_list(master, apply_button):
                     if index > 0:
                         box_temp = box_list[index - 1]
                         x_pos += int(box_temp.cget('width'))
-                        if x_pos >= 680:
+                        if x_pos >= 680: # Width threshold of new Line once certain x_pos on canvas
                             x_pos = 35
                             y_pos += 50
                     temp_str = str("{ " + temp_list[index] + " : " + str(input_obj.get(temp_list[index])) + " }")
                     box_list.append(box(master, temp_str, x_pos, y_pos))
                     main_panel.configure(scrollregion = (0, 0, 1, y_pos + 20))
 
-        case tuple():
-                for index in range(0, len(input_obj)):
-                    if index > 0:
-                        box_temp = box_list[index - 1]
-                        x_pos += int(box_temp.cget('width'))
-                        if x_pos >= 680:
-                            x_pos = 35
-                            y_pos += 50
-
-                    box_list.append(box(master, input_obj[index], x_pos, y_pos))
-                    main_panel.configure(scrollregion = (0, 0, 1, y_pos + 20))
-
-        case set():
+        case set() | frozenset():
                 index = 0
                 for single_item in input_obj:
                     if index > 0:
                         box_temp = box_list[index - 1]
                         x_pos += int(box_temp.cget('width'))
-                        if x_pos >= 680:
+                        if x_pos >= 680: # Width threshold of new Line once certain x_pos on canvas
                             x_pos = 35
                             y_pos += 50
                     index += 1
                     box_list.append(box(master, single_item, x_pos, y_pos))
                     main_panel.configure(scrollregion = (0, 0, 1, y_pos + 20))
-        case frozenset():
-                index = 0
-                for single_item in input_obj:
-                    if index > 0:
-                        box_temp = box_list[index - 1]
-                        x_pos += int(box_temp.cget('width'))
-                        if x_pos >= 680:
-                            x_pos = 35
-                            y_pos += 50
-                    index += 1
-                    box_list.append(box(master, single_item, x_pos, y_pos))
-                    main_panel.configure(scrollregion = (0, 0, 1, y_pos + 20))
-                
+
+    for single_box in box_list:
+        single_box.move_after_place(75, 100)
+    """
     x = 0
     for single_box in box_list:
-        if x <= 64:   # 13, 26, 39, 52, 65
+        if x <= 64:   # Counter for x amount of boxes placed, once 65 then place frames instantly.
             single_box.sliding_frame()
             x += 1
         else:
             single_box.place_frame()
+    """
     apply_button.config(state = 'active')
 
 # =================================================================================================
@@ -203,17 +215,17 @@ def apply_list(master, apply_button):
 #          - Returns None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-def selected(event):
+def selected(event, apply_button):
     # Sets main planels lable with tree selected item
     var_label = tree.selection()
     string = tree.item(var_label[0])
     main_P_title.config(text = string["text"])
 
-    Note_B_label.config(state = 'normal')
-
     # Add much of existing DSAs to diction  : TODO
     matcher_dic = {"List": 0, "Dictionary": 1, "Tuples": 2, "Set": 3, "frozen set": 4}
 
+
+    Note_B_label.config(state = 'normal')
     Note_B_label.delete(0.0, tk.END)
 
     # NOTEBOOK TAB 1
@@ -419,7 +431,6 @@ def main():
     # Dev tool for tab 2 input setup
     root.bind("<asciitilde>", lambda event: helper_window(event, notebook_frame_2))
 
-    global apply_button
     apply_button = tk.Button(root, command = lambda: apply_list(main_panel, apply_button), text = 'apply', state = 'disabled')
     apply_button.place(anchor = 'nw', x = 728, y = 277)
 
@@ -451,8 +462,8 @@ def main():
     tree.place(relx = 0.01, rely = 0.999, anchor = 'nw', width = 275, y = -110, x = -10)
 
     # Mouse double left click for tree widget and enter too select the tree
-    tree.bind("<Double-1>", lambda event : selected(event))
-    tree.bind("<Return>", lambda event : selected(event))
+    tree.bind("<Double-1>", lambda event : selected(event, apply_button))
+    tree.bind("<Return>", lambda event : selected(event, apply_button))
 
 
     # Tree Scroll Bar - Needs improvement..
