@@ -46,7 +46,7 @@ class box(tk.Frame):
         self.fin_y = y_pos
         
         
-        self.canvas_id = main_panel.create_window(x_pos, -65, window = self, anchor = 'nw')
+        self.canvas_id = main_panel.create_window(0, 0, window = self, anchor = 'nw')
 
         if len(str(label)) >= 5:
             self.config(width = BOX_WIDTH + ((len(str(label))) * 5))
@@ -69,22 +69,29 @@ class box(tk.Frame):
         y = curr_pos[1]
         x_chng = 0
         y_chng = 0
-        if x < new_x and y < new_y:
+        # Right or Left
+        if x < new_x and x != new_x:
             x_chng = 1
-            y_chng = 1
-        if x < new_x and y > new_y:
-            x_chng = 1
-            y_chng = -1
-        if x > new_x and y < new_y:
+        elif x > new_x and x != new_x:
             x_chng = -1
+
+        # Up or down
+        if y < new_y and y != new_y:
             y_chng = 1
-        if x > new_x and y > new_y:
-            x_chng = -1
+        elif y > new_y and y != new_y:
             y_chng = -1
-        while(x != new_x and y != new_y):
+    
+        while True:
+            if x == new_x:
+                x_chng = 0
+            if y == new_y:
+                y_chng = 0
+            if x == new_x and y == new_y:
+                break
             x += x_chng
             y += y_chng
             main_panel.move(self.canvas_id, x_chng, y_chng)
+            self.update()
         
             
     # Directly places blocks at thier coords
@@ -124,7 +131,18 @@ def clear_frame(frame):
 
 # =================================================================================================
 
+def apply_pos(t_pos_seq, t_box_list):
+    t_pos_list = main_panel.coords(single_box.canvas_id)
+    y_curr_pos = t_pos_list[1]
+    for x, y in t_pos_seq:
+        for single_box in t_box_list:
+            main_panel.after(10)
+            single_box.move_after_place(x, y)
+            x += int(single_box.cget('width'))
+            if y_curr_pos >= 680:
+                y += int(single_box.cget('height'))
 
+    
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # - Places Frames into canvas with Label corrasponding to the list integer
@@ -134,9 +152,7 @@ def clear_frame(frame):
 def apply_list(master, apply_button):
     apply_button.config(state = 'disabled')
     box_list = []
-    pos = get_start_pos()
-    x_pos = pos[0]
-    y_pos = pos[1]
+    pos_seq = get_pos_seq()
 
     apply_button.config(bg = 'light grey', activebackground = 'light grey')
     clear_frame(master)
@@ -150,13 +166,12 @@ def apply_list(master, apply_button):
             for index in range(0, len(input_obj)):
                 if index > 0:
                     box_temp = box_list[index - 1]
-                    x_pos += int(box_temp.cget('width'))
-                    if x_pos >= 680: # Width threshold of new Line once certain x_pos on canvas
-                        x_pos = 35
-                        y_pos += 50
+                    #pos_seq[0][0] += int(box_temp.cget('width'))
 
-                box_list.append(box(master, input_obj[index], x_pos, y_pos))
-                main_panel.configure(scrollregion = (0, 0, 1, y_pos + 20))
+                     
+
+                box_list.append(box(master, input_obj[index], pos_seq[0][0], pos_seq[0][1]))
+                main_panel.configure(scrollregion = (0, 0, 1, pos_seq[0][1] + 20))
 
         case dict():
                 temp_list = []
@@ -165,29 +180,31 @@ def apply_list(master, apply_button):
                 for index in range(0, len(input_obj)):
                     if index > 0:
                         box_temp = box_list[index - 1]
-                        x_pos += int(box_temp.cget('width'))
-                        if x_pos >= 680: # Width threshold of new Line once certain x_pos on canvas
-                            x_pos = 35
-                            y_pos += 50
+                        # x_pos += int(box_temp.cget('width'))
+                        # if x_pos >= 680: # Width threshold of new Line once certain x_pos on canvas
+                        #    x_pos = 35
+                        #    y_pos += 50
                     temp_str = str("{ " + temp_list[index] + " : " + str(input_obj.get(temp_list[index])) + " }")
-                    box_list.append(box(master, temp_str, x_pos, y_pos))
-                    main_panel.configure(scrollregion = (0, 0, 1, y_pos + 20))
+                    box_list.append(box(master, temp_str, pos_seq[0][0], pos_seq[0][1]))
+                    main_panel.configure(scrollregion = (0, 0, 1, pos_seq[0][1] + 20))
 
         case set() | frozenset():
                 index = 0
                 for single_item in input_obj:
                     if index > 0:
                         box_temp = box_list[index - 1]
-                        x_pos += int(box_temp.cget('width'))
-                        if x_pos >= 680: # Width threshold of new Line once certain x_pos on canvas
-                            x_pos = 35
-                            y_pos += 50
+                        #x_pos += int(box_temp.cget('width'))
+                        #if x_pos >= 680: # Width threshold of new Line once certain x_pos on canvas
+                        #    x_pos = 35
+                        #    y_pos += 50
                     index += 1
-                    box_list.append(box(master, single_item, x_pos, y_pos))
-                    main_panel.configure(scrollregion = (0, 0, 1, y_pos + 20))
+                    box_list.append(box(master, single_item, pos_seq[0][0], pos_seq[0][1]))
+                    main_panel.configure(scrollregion = (0, 0, 1, pos_seq[0][1] + 20))
 
-    for single_box in box_list:
-        single_box.move_after_place(75, 100)
+    apply_pos(pos_seq, box_list)
+
+
+    # Standard
     """
     x = 0
     for single_box in box_list:
