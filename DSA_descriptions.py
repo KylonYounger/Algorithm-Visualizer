@@ -50,7 +50,16 @@ def DSA_des_index(x):
 
     - Although frozen sets are the same as sets, frozen sets have it's own methods that allow to return \
 a version of the frozen set that is compaired to another set.
+    """,
+    10:
+    """ Stacks -
+    - Stacks are a data structure in which data is last in first out.
+    - If a list of items are added to a stack, the last item added to a stack is the first removed from the stack.
+
+    - Some concepts explain stacks as grown downward. This is the same case.
+    Ex: [1], [2], [3]   - 1 is the top of the stack and the first to be removed.
+
     """
-    }
+}
     
     return my_des_dic[x]

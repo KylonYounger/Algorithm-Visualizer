@@ -23,6 +23,7 @@ import DSA_descriptions as des
 from DSA_InputSpecs import *
 import tkinter as tk
 from tkinter import ttk
+import DSA as dsa
 
 
 BOX_WIDTH = 50
@@ -46,7 +47,7 @@ class box(tk.Frame):
         self.fin_y = y_pos
         
         
-        self.canvas_id = main_panel.create_window(0, 0, window = self, anchor = 'nw')
+        self.canvas_id = main_panel.create_window(354, -60, window = self, anchor = 'nw')
 
         if len(str(label)) >= 5:
             self.config(width = BOX_WIDTH + ((len(str(label))) * 5))
@@ -54,51 +55,47 @@ class box(tk.Frame):
         self.box_label = tk.Label(self, text = label)
         self.box_label.place(anchor = 's', relx = .5, rely = 0.9) # CENTER OF BOX_TEMP
 
-
-    # Animation for the insert of a new block
-    def sliding_frame(self):
-        x = 0
-        while(x <= self.fin_y):
-            x += 1
-            main_panel.move(self.canvas_id, 0, 1)
-            self.update()
-
-    def move_after_place(self, new_x, new_y):
+    def move_after_place(self, new_x, new_y, speed = 1):
         curr_pos = main_panel.coords(self.canvas_id)
         x = curr_pos[0]
         y = curr_pos[1]
         x_chng = 0
         y_chng = 0
-        # Right or Left
+        # Right or Left (direction)
         if x < new_x and x != new_x:
-            x_chng = 1
+            x_chng = 1 * speed
         elif x > new_x and x != new_x:
-            x_chng = -1
+            x_chng = -1 * speed
 
-        # Up or down
+        # Up or down (direction)
         if y < new_y and y != new_y:
-            y_chng = 1
+            y_chng = 1 * speed
         elif y > new_y and y != new_y:
-            y_chng = -1
+            y_chng = -1 * speed
     
-        while True:
-            if x == new_x:
-                x_chng = 0
-            if y == new_y:
-                y_chng = 0
-            if x == new_x and y == new_y:
+        while True: # Condition if pos is exact
+            if y_chng >= 1:
+                if y >= new_y:
+                    y_chng = 0
+            elif y_chng <= 0:
+                if y <= new_y:
+                    y_chng = 0
+            if x_chng >= 1:
+                if x >= new_x:
+                    x_chng = 0
+            elif x_chng <= 0:
+                if x <= new_x:
+                    x_chng = 0
+                
+            if x_chng == 0 and y_chng == 0:
+                main_panel.coords(self.canvas_id, new_x, new_y)
+                main_panel.configure(scrollregion = (0, 0, 750, new_y + 65))
                 break
             x += x_chng
             y += y_chng
             main_panel.move(self.canvas_id, x_chng, y_chng)
             self.update()
         
-            
-    # Directly places blocks at thier coords
-    def place_frame(self):
-        main_panel.coords(self.canvas_id, self.fin_x, self.fin_y - 65)
-        self.update()
-
 # =================================================================================================
 
 
@@ -131,18 +128,22 @@ def clear_frame(frame):
 
 # =================================================================================================
 
-def apply_pos(t_pos_seq, t_box_list):
-    t_pos_list = main_panel.coords(single_box.canvas_id)
-    y_curr_pos = t_pos_list[1]
+def apply_line_pos(t_pos_seq, t_box_list):
+    speed = 2
     for x, y in t_pos_seq:
         for single_box in t_box_list:
-            main_panel.after(10)
-            single_box.move_after_place(x, y)
+            main_panel.after(10, single_box.move_after_place(x, y, speed))
             x += int(single_box.cget('width'))
-            if y_curr_pos >= 680:
+            if x >= 680:
                 y += int(single_box.cget('height'))
+                x = t_pos_seq[0][0]
+                speed += 2
 
-    
+def apply_stack_pos(t_pos_seq, t_box_list):
+    for x, y in t_pos_seq:
+        for single_box in t_box_list:
+            main_panel.after(10, single_box.move_after_place(x, y))
+            y += int(single_box.cget('height'))
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # - Places Frames into canvas with Label corrasponding to the list integer
@@ -153,7 +154,8 @@ def apply_list(master, apply_button):
     apply_button.config(state = 'disabled')
     box_list = []
     pos_seq = get_pos_seq()
-
+    DSA_id = dsa.get_id()
+ 
     apply_button.config(bg = 'light grey', activebackground = 'light grey')
     clear_frame(master)
     # UPDATE Canvas
@@ -164,56 +166,26 @@ def apply_list(master, apply_button):
     match input_obj:
         case list() | tuple():
             for index in range(0, len(input_obj)):
-                if index > 0:
-                    box_temp = box_list[index - 1]
-                    #pos_seq[0][0] += int(box_temp.cget('width'))
-
-                     
-
                 box_list.append(box(master, input_obj[index], pos_seq[0][0], pos_seq[0][1]))
-                main_panel.configure(scrollregion = (0, 0, 1, pos_seq[0][1] + 20))
-
+                
         case dict():
-                temp_list = []
-                for x in input_obj:
-                    temp_list.append(x)
-                for index in range(0, len(input_obj)):
-                    if index > 0:
-                        box_temp = box_list[index - 1]
-                        # x_pos += int(box_temp.cget('width'))
-                        # if x_pos >= 680: # Width threshold of new Line once certain x_pos on canvas
-                        #    x_pos = 35
-                        #    y_pos += 50
-                    temp_str = str("{ " + temp_list[index] + " : " + str(input_obj.get(temp_list[index])) + " }")
-                    box_list.append(box(master, temp_str, pos_seq[0][0], pos_seq[0][1]))
-                    main_panel.configure(scrollregion = (0, 0, 1, pos_seq[0][1] + 20))
-
+            temp_list = []
+            for x in input_obj:
+                temp_list.append(x)
+            for index in range(0, len(input_obj)):
+                temp_str = str("{ " + temp_list[index] + " : " + str(input_obj.get(temp_list[index])) + " }")
+                box_list.append(box(master, temp_str, pos_seq[0][0], pos_seq[0][1]))
+                    
         case set() | frozenset():
-                index = 0
-                for single_item in input_obj:
-                    if index > 0:
-                        box_temp = box_list[index - 1]
-                        #x_pos += int(box_temp.cget('width'))
-                        #if x_pos >= 680: # Width threshold of new Line once certain x_pos on canvas
-                        #    x_pos = 35
-                        #    y_pos += 50
-                    index += 1
-                    box_list.append(box(master, single_item, pos_seq[0][0], pos_seq[0][1]))
-                    main_panel.configure(scrollregion = (0, 0, 1, pos_seq[0][1] + 20))
+            for single_item in input_obj:
+                box_list.append(box(master, single_item, pos_seq[0][0], pos_seq[0][1]))
 
-    apply_pos(pos_seq, box_list)
-
-
-    # Standard
-    """
-    x = 0
-    for single_box in box_list:
-        if x <= 64:   # Counter for x amount of boxes placed, once 65 then place frames instantly.
-            single_box.sliding_frame()
-            x += 1
-        else:
-            single_box.place_frame()
-    """
+    match DSA_id:
+        case None:
+            apply_line_pos(pos_seq, box_list)
+        case "Stacks":
+            apply_stack_pos(pos_seq, box_list)
+            
     apply_button.config(state = 'active')
 
 # =================================================================================================
@@ -237,9 +209,10 @@ def selected(event, apply_button):
     var_label = tree.selection()
     string = tree.item(var_label[0])
     main_P_title.config(text = string["text"])
+    dsa.set_id(None)
 
     # Add much of existing DSAs to diction  : TODO
-    matcher_dic = {"List": 0, "Dictionary": 1, "Tuples": 2, "Set": 3, "frozen set": 4}
+    matcher_dic = {"List": 0, "Dictionary": 1, "Tuples": 2, "Set": 3, "frozen set": 4, "Stacks": 10}
 
 
     Note_B_label.config(state = 'normal')

@@ -1,6 +1,6 @@
 import tkinter as tk
 import random as ran
-
+import DSA as dsa
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # - Sets up input frame for notebook tab 2.
 # - This can be anything for each TreeView item.
@@ -17,21 +17,22 @@ import random as ran
 #    
 #    Done: - None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+global return_str
+return_str = ""
 def Input_Def(master, x, apply_button):
     global input_obj
     BUILT_IN_DSA_POS = [[20, 20]]
 
     general_label = tk.Label(master)
     general_label.place(anchor= 'nw', x = -10, y = -10)
-
     general_bullet = tk.Label(master, bd = 1, relief = 'solid')
-    
 
     # Tlc function to pass function correctly for wrapper
     vcmd = master.register(entry_checker)
+    
 
     match x:
-        case 0:
+        case 0: # List
             # LIST FACTS: 
             # Can have multiple data types
             # can have duplicates
@@ -43,8 +44,9 @@ def Input_Def(master, x, apply_button):
             # LABELS
             general_label.config(text = "List Input: ")
 
-            list_label2 = tk.Label(master, text = "Please type in a list of data seperated by a comma and press enter:", wraplength = 300, justify = 'left', relief = 'solid', bd = 1)
-            list_label2.place(anchor = 'nw', x = 0, y = 9)
+            main_label = tk.Label(master, wraplength = 300, justify = 'left', relief = 'solid', bd = 1)
+            main_label.place(anchor = 'nw', x = 0, y = 9)
+            main_label.config(text = "Please type in a list of data seperated by a comma and press enter:")
             
             list_box2_Label = tk.Label(master, bd = 3, text = ":Enter a list index")
             list_box2_Label.place(anchor = 'nw', x = 38, y = 108)
@@ -60,10 +62,10 @@ def Input_Def(master, x, apply_button):
             # ENTRY
             
             # Validate 'key' checks the entered values after each key press
-            global list_box
-            list_box = tk.Entry(master, bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
-            list_box.place(anchor = 'nw', x = 0, y = 45)
-            list_box.insert(0, '0,1,2,3,4')
+            global main_box
+            main_box = tk.Entry(master, bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
+            main_box.place(anchor = 'nw', x = 0, y = 45)
+            main_box.insert(0, '0,1,2,3,4')
             
             global list_box_index
             list_box_index = tk.Entry(master, bd = 3, width = 5, validate = 'key', validatecommand = (vcmd, "%P"))
@@ -73,7 +75,7 @@ def Input_Def(master, x, apply_button):
             list_box_val = tk.Entry(master, bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
             list_box_val.place(anchor = 'nw', x = 0, y = 130)
 
-            list_box.bind("<Return>", lambda e: val_ent(e, apply_button, list_box.get()))
+            main_box.bind("<Return>", lambda e: val_ent(e, apply_button, main_box.get()))
             list_box_index.bind("<Return>", lambda e: change_index(index_entry = list_box_index, val_entry = list_box_val, apply_button = apply_button, input_obj = input_obj))
             list_box_val.bind("<Return>", lambda e: change_index(index_entry = list_box_index, val_entry = list_box_val, apply_button = apply_button, input_obj = input_obj))
 
@@ -84,7 +86,7 @@ def Input_Def(master, x, apply_button):
             list_Button = tk.Button(master, text = 'remove end', command = lambda: remove_end(input_obj, apply_button))
             list_Button.place(anchor = 'nw', x = 315, y = 26)
 
-        case 1:
+        case 1: # dictionary
             # store data values in key:value pairs
             # Ordered
             # Changeable
@@ -133,7 +135,7 @@ def Input_Def(master, x, apply_button):
             dic_button_2 = tk.Button(master, text = "Remove last key", command = lambda: remove_end(input_obj, apply_button))
             dic_button_2.place(anchor = 'nw', x = 210, y = 127)
 
-        case 2:
+        case 2: # Tuple
             # Tuple Facts:
             #   Ordered, unchangeable, allowed duplicates
             input_obj = ()
@@ -176,7 +178,7 @@ def Input_Def(master, x, apply_button):
 
             tuple_entry_box3.bind("<Return>", lambda e: rand_tuple_size(e, apply_button, tuple_entry_box3.get()))
 
-        case 3:
+        case 3: # Set
 
             input_obj = set()
             set_pos_seq(BUILT_IN_DSA_POS)
@@ -204,11 +206,11 @@ def Input_Def(master, x, apply_button):
             set_remove_end = tk.Button(master, text = "Remove random item", command = lambda: remove_end(input_obj, apply_button))
             set_remove_end.place(anchor = 'nw', x = 210, y = 127)
 
-        case 4:
+        case 4: # Frozenset
             input_obj = frozenset()
             set_pos_seq(BUILT_IN_DSA_POS)
             # LABELS
-            general_label.config(text = 'frozen set Input: ')
+            general_label.config(text = 'frozen sets Input: ')
             
             general_bullet.config(text = "Frozen sets:\n - Are unordered \n - Unchangeable \n - No duplicates \n - Immutable")
             general_bullet.place(anchor = 'nw', x = 338, y = 87)
@@ -223,11 +225,52 @@ def Input_Def(master, x, apply_button):
             
             fset_entry_box.bind("<Return>", lambda e: val_ent(e, apply_button, fset_entry_box.get()))
             
+        case 10: # Stacks
+            stack_obj = dsa.stack()
+            input_obj = []
+            set_pos_seq([[354, 20]])
+
+            # Labels
+            general_label.config(text = 'Stack Input: ')
+                        
+            general_bullet.config(text = "Stacks:\n - [LIFO] \n Built top down \n - Uses List type")
+            general_bullet.place(anchor = 'nw', x = 342, y = 100)
+
+            # Entrys
+            global stack_entry
+            stack_entry = tk.Entry(master, bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
+            stack_entry.place(anchor = 'nw', x = -3, y = 55)
+            stack_entry.bind("<Return>", lambda e: stack_prop(apply_button, stack_obj, stack_entry.get(), opp = "push"))
+
+            # Buttons
+            stack_button1 = tk.Button(master, text = "Pop off Stack", command = lambda: stack_prop(apply_button, stack_obj, opp = "pop"))
+            stack_button1.place(anchor= 'nw', x = 210, y = 100)
+
+
+        case _:
+            input_obj = []
+            
+            
     return None
 
 # =================================================================================================
 
-
+def stack_prop(apply_button, obj, val = None, opp = None):
+    global input_obj
+    apply_button.config(bg = 'pink', activebackground = 'pink')
+    match opp:
+        case "push":
+            obj.push(val)
+        case 'pop':
+            return_str = obj.pop()
+        case "peek":
+            return_str = obj.peek()
+        case "size":
+            return_str = obj.size()
+    
+    input_obj = obj.stack
+    stack_entry.delete(0, tk.END)
+        
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 # - Checks if curr_val entered into entry box is a number or a backspace
@@ -277,7 +320,7 @@ def val_ent(e, apply_button, val):
                 input_obj.remove(x)
             if x == '':
                 input_obj.remove(x)
-        list_box.delete(0, tk.END)
+        main_box.delete(0, tk.END)
         
     # Error checking for bad input, currently works for none ":" in the entry box
     # configs the label text and position to GUI the user
@@ -510,3 +553,6 @@ def set_pos_seq(list):
 def get_pos_seq():
     return pos_list
 # =================================================================================================
+
+def get_ret_string():
+    return return_str
