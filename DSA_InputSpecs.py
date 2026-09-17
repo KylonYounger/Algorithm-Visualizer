@@ -23,117 +23,116 @@ def Input_Def(master, x, apply_button):
     global input_obj
     BUILT_IN_DSA_POS = [[20, 20]]
 
-    general_label = tk.Label(master)
-    general_label.place(anchor= 'nw', x = -10, y = -10)
-    general_bullet = tk.Label(master, bd = 1, relief = 'solid')
-
     # Tlc function to pass function correctly for wrapper
     vcmd = master.register(entry_checker)
-    
+
+    top_label = tk.Label(master)
+    top_label.place(anchor = 'nw', x = -10, y = -10)
+
+    main_entry_label = tk.Label(master, wraplength = 300, justify = 'left', relief = 'solid', bd = 1)
+    main_entry_label.place(anchor = 'nw', x = 0, y = 9)
+
+    general_label2 = tk.Label(master)
+    general_label2.place(anchor = 'nw', x = -10, y = 30)
+
+    general_label3 = tk.Label(master)
+    general_label3.place(anchor = 'nw', x = -10, y = 60)
+
+    general_label4 = tk.Label(master)
+    general_label4.place(anchor = 'nw', x = -10, y = 80)
+
+    general_bullet = tk.Label(master, bd = 1, relief = 'solid')
+
+    main_entry_box = tk.Entry(master, bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
+    main_entry_box.place(anchor = 'nw', x = 0, y = 45)
+
+    general_entry1 = tk.Entry(master, bd = 3, width = 5, validate = 'key', validatecommand = (vcmd, "%P"))
+    general_entry2 = tk.Entry(master, bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
+    general_entry3 = tk.Entry(master, bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
+
+    general_button1 = tk.Button(master)
+    general_button2 = tk.Button(master)
 
     match x:
         case 0: # List
-            # LIST FACTS: 
-            # Can have multiple data types
-            # can have duplicates
-            # can change, add, remove after created
-            # is ordered
             input_obj = []
             set_pos_seq(BUILT_IN_DSA_POS)
 
             # LABELS
-            general_label.config(text = "List Input: ")
+            top_label.config(text = "List Input: ")
 
-            main_label = tk.Label(master, wraplength = 300, justify = 'left', relief = 'solid', bd = 1)
-            main_label.place(anchor = 'nw', x = 0, y = 9)
-            main_label.config(text = "Please type in a list of data seperated by a comma and press enter:")
-            
-            list_box2_Label = tk.Label(master, bd = 3, text = ":Enter a list index")
-            list_box2_Label.place(anchor = 'nw', x = 38, y = 108)
+            main_entry_label.config(text = "Please type in a list of data seperated by a comma and press enter:")
 
-            list_box3_Label = tk.Label(master, bd = 3, text = " :Enter a value to change that index")
-            list_box3_Label.place(anchor = 'nw', x = 65, y = 128)
+            general_label2.config(bd = 3, text = ":Enter a list index")
+            general_label2.place(anchor = 'nw', x = 38, y = 108)
 
-            list_change = tk.Label(master, bd = 1, text = "Change the list value at the specific index: \n(0 is the starting number)", relief = 'solid')
-            list_change.place(anchor = 'nw', x = 0, y = 73)
+            general_label3.config(bd = 3, text = " :Enter a value to change that index")
+            general_label3.place(anchor = 'nw', x = 65, y = 128)
+
+            general_label4.config(bd = 1, text = "Change the list value at the specific index: \n(0 is the starting number)", relief = 'solid')
+            general_label4.place(anchor = 'nw', x = 0, y = 73)
 
             general_bullet.config(text = "Lists Can have:\n - Any data types \n - Is ordered \n - Changeable data \n - Allowed Duplicates")
             general_bullet.place(anchor = 'nw', x = 315, y = 87)
+
             # ENTRY
+            # Validate 'key' checks the entered values after each key press  
+            main_entry_box.insert(0, '0,1,2,3,4')
+    
+            general_entry1.place(anchor = 'nw', x = 0, y = 110)
+            general_entry2.place(anchor = 'nw', x = 0, y = 130)
             
-            # Validate 'key' checks the entered values after each key press
-            global main_box
-            main_box = tk.Entry(master, bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
-            main_box.place(anchor = 'nw', x = 0, y = 45)
-            main_box.insert(0, '0,1,2,3,4')
+            main_entry_box.bind("<Return>", lambda e: val_ent(e, apply_button, widget = main_entry_box))
+            general_entry1.bind("<Return>", lambda e: change_index(index_entry = general_entry1, val_entry = general_entry2, apply_button = apply_button, input_obj = input_obj))
+            general_entry2.bind("<Return>", lambda e: change_index(index_entry = general_entry1, val_entry = general_entry2, apply_button = apply_button, input_obj = input_obj))
             
-            global list_box_index
-            list_box_index = tk.Entry(master, bd = 3, width = 5, validate = 'key', validatecommand = (vcmd, "%P"))
-            list_box_index.place(anchor = 'nw', x = 0, y = 110)
-            
-            global list_box_val
-            list_box_val = tk.Entry(master, bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
-            list_box_val.place(anchor = 'nw', x = 0, y = 130)
-
-            main_box.bind("<Return>", lambda e: val_ent(e, apply_button, main_box.get()))
-            list_box_index.bind("<Return>", lambda e: change_index(index_entry = list_box_index, val_entry = list_box_val, apply_button = apply_button, input_obj = input_obj))
-            list_box_val.bind("<Return>", lambda e: change_index(index_entry = list_box_index, val_entry = list_box_val, apply_button = apply_button, input_obj = input_obj))
-
             # BOXES
-            list_Button = tk.Button(master, text = 'add random integer', command = lambda: add_rand(input_obj, apply_button))
-            list_Button.place(anchor = 'nw', x = 315, y = 0)
+            general_button1.config(text = 'add random integer', command = lambda: add_rand(input_obj, apply_button))
+            general_button1.place(anchor = 'nw', x = 315, y = 0)
 
-            list_Button = tk.Button(master, text = 'remove end', command = lambda: remove_end(input_obj, apply_button))
-            list_Button.place(anchor = 'nw', x = 315, y = 26)
+            general_button2.config(text = 'remove end', command = lambda: remove_end(input_obj, apply_button))
+            general_button2.place(anchor = 'nw', x = 315, y = 26)
 
         case 1: # dictionary
-            # store data values in key:value pairs
-            # Ordered
-            # Changeable
-            # NO duplicates
             input_obj = {}
             set_pos_seq(BUILT_IN_DSA_POS)
 
             # LABELS
-            general_label.config(text = 'Dictionary Input: ')
+            top_label.config(text = 'Dictionary Input: ')
 
-            global dic_entry1_label
-            dic_entry1_label = tk.Label(master, justify = 'left', text = ' Please type in a dictionary of data seperated by a ":" and press enter: ', bd = 1, relief = 'solid')
-            dic_entry1_label.place(anchor= 'nw', x = -4, y = 15)
+            main_entry_label.config(justify = 'left', text = ' Please type in a dictionary of data seperated by a ":" and press enter: ')
+            main_entry_label.place(anchor= 'nw', x = -3, y = 12)
 
-            dic_entry2_label = tk.Label(master,justify = 'left', text = '\nAdd/Change key: ')
-            dic_entry2_label.place(anchor= 'nw', x = -7, y = 67)
+            general_label2.config(justify = 'left', text = '\nAdd/Change key: ')
+            general_label2.place(anchor= 'nw', x = -7, y = 67)
 
-            dic_entry2_label = tk.Label(master, text = 'Add/Change value: ')
-            dic_entry2_label.place(anchor= 'nw', x = -7, y = 124)
+            general_label3.config(text = 'Add/Change value: ')
+            general_label3.place(anchor= 'nw', x = -7, y = 124)
 
             general_bullet.config(text = "Dictionaries have:\n - Key:Value Pairs \n - Is ordered \n - Changeable data \n - No Duplicates")
             general_bullet.place(anchor = 'nw', x = 320, y = 85)
 
             # ENTRY BOXES
-            global dic_entry_box
-            dic_entry_box = tk.Entry(master, bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
-            dic_entry_box.place(anchor = 'nw', x = -3, y = 42)
-            dic_entry_box.insert(0, "1:2,Apple:4")
+            main_entry_box.config(bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
+            main_entry_box.place(anchor = 'nw', x = -3, y = 49)
+            main_entry_box.insert(0, "1:2,Apple:4")
 
-            global dic_index_box
-            dic_index_box = tk.Entry(master, bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
-            dic_index_box.place(anchor = 'nw', x = -3, y = 102)
+            general_entry2.config(bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
+            general_entry2.place(anchor = 'nw', x = -3, y = 102)
 
-            global dic_val_box
-            dic_val_box = tk.Entry(master, bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
-            dic_val_box.place(anchor = 'nw', x = -3, y = 144)
+            general_entry3.config(bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
+            general_entry3.place(anchor = 'nw', x = -3, y = 144)
 
-            dic_entry_box.bind("<Return>", lambda e: val_ent(e, apply_button, dic_entry_box.get()))
-            dic_index_box.bind("<Return>", lambda e: change_index(dic_index_box, dic_val_box, input_obj, apply_button))
-            dic_val_box.bind("<Return>", lambda e: change_index(dic_index_box, dic_val_box, input_obj, apply_button))
+            main_entry_box.bind("<Return>", lambda e: val_ent(e, apply_button, widget = main_entry_box))
+            general_entry2.bind("<Return>", lambda e: change_index(general_entry2, general_entry3, input_obj, apply_button))
+            general_entry3.bind("<Return>", lambda e: change_index(general_entry2, general_entry3, input_obj, apply_button))
 
             # BUTTONS
-            dic_button_1 = tk.Button(master, text = "Add random key", command = lambda: add_rand(input_obj, apply_button))
-            dic_button_1.place(anchor= 'nw', x = 210, y = 100)
+            general_button1.config(text = "Add random key", command = lambda: add_rand(input_obj, apply_button))
+            general_button1.place(anchor= 'nw', x = 210, y = 100)
 
-            dic_button_2 = tk.Button(master, text = "Remove last key", command = lambda: remove_end(input_obj, apply_button))
-            dic_button_2.place(anchor = 'nw', x = 210, y = 127)
+            general_button2.config(text = "Remove last key", command = lambda: remove_end(input_obj, apply_button))
+            general_button2.place(anchor = 'nw', x = 210, y = 127)
 
         case 2: # Tuple
             # Tuple Facts:
@@ -142,41 +141,36 @@ def Input_Def(master, x, apply_button):
             set_pos_seq(BUILT_IN_DSA_POS)
 
             # LABELS
-            general_label.config(text = 'Tuple Input: ')
+            top_label.config(text = 'Tuple Input: ')
             
             general_bullet.config(text = "Tuples:\n - Are ordered \n - Unchangeable data \n - Allow duplicates")
             general_bullet.place(anchor = 'nw', x = 310, y = 100)
 
-            tuple_label_2 = tk.Label(master, wraplength = 400, justify = 'left', text = ' Please type in a tuple of data seperated by a "," to create a new tuple and press enter: ', bd = 1, relief = 'solid')
-            tuple_label_2.place(anchor = 'nw', x = -3, y = 10)
+            main_entry_label.config(wraplength = 400, justify = 'left', text = ' Please type in a tuple of data seperated by a "," to create a new tuple and press enter: ', bd = 1, relief = 'solid')
+            main_entry_label.place(anchor = 'nw', x = -3, y = 10)
 
-            tuple_label_3 = tk.Label(master, text = 'Join a new tuple to the existing one: ')
-            tuple_label_3.place(anchor = 'nw', x = -5, y = 69)
+            general_label2.config(text = 'Join a new tuple to the existing one: ')
+            general_label2.place(anchor = 'nw', x = -5, y = 69)
 
-            tuple_label_3 = tk.Label(master, justify = 'left', text = 'Enter a size of random values to be created\n into a new tuple: ')
-            tuple_label_3.place(anchor = 'nw', x = -7, y = 110)
-
-            
-
+            general_label3.config(justify = 'left', text = 'Enter a size of random values to be created\n into a new tuple: ')
+            general_label3.place(anchor = 'nw', x = -7, y = 110)
+    
             # ENTRY
-            global tuple_entry_box
-            tuple_entry_box = tk.Entry(master, bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
-            tuple_entry_box.place(anchor = 'nw', x = -3, y = 48)
-            tuple_entry_box.insert(0, "1,2,True,4,apple,apple")
+            main_entry_box.config(bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
+            main_entry_box.place(anchor = 'nw', x = -3, y = 48)
+            main_entry_box.insert(0, "1,2,True,4,apple,apple")
 
-            tuple_entry_box.bind("<Return>", lambda e: val_ent(e, apply_button, tuple_entry_box.get()))
+            main_entry_box.bind("<Return>", lambda e: val_ent(e, apply_button, widget = main_entry_box))
 
-            global tuple_entry_box2
-            tuple_entry_box2 = tk.Entry(master, bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
-            tuple_entry_box2.place(anchor = 'nw', x = -3, y = 88)
+            general_entry2 = tk.Entry(master, bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
+            general_entry2.place(anchor = 'nw', x = -3, y = 88)
 
-            tuple_entry_box2.bind("<Return>", lambda e: join_tuple(e, apply_button, tuple_entry_box2.get()))
+            general_entry2.bind("<Return>", lambda e: join_tuple(e, apply_button, widget = general_entry2))
 
-            global tuple_entry_box3
-            tuple_entry_box3 = tk.Entry(master, bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
-            tuple_entry_box3.place(anchor = 'nw', x = -3, y = 145)
+            general_entry3.config(bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
+            general_entry3.place(anchor = 'nw', x = -3, y = 145)
 
-            tuple_entry_box3.bind("<Return>", lambda e: rand_tuple_size(e, apply_button, tuple_entry_box3.get()))
+            general_entry3.bind("<Return>", lambda e: rand_tuple_size(e, apply_button, widget = general_entry3))
 
         case 3: # Set
 
@@ -184,46 +178,45 @@ def Input_Def(master, x, apply_button):
             set_pos_seq(BUILT_IN_DSA_POS)
             
             # LABELS
-            general_label.config(text = 'Set Input: ')
+            top_label.config(text = 'Set Input: ')
             
             general_bullet.config(text = "Sets:\n - Are unordered \n - Unchangeable \n - No duplicates")
             general_bullet.place(anchor = 'nw', x = 337, y = 100)
 
-            set_input_label = tk.Label(master, wraplength = 400, justify = 'left', text = ' Please type in a set of data seperated by a "," and press enter: ', bd = 1, relief = 'solid')
-            set_input_label.place(anchor = 'nw', x = -3, y = 20)
+            main_entry_label.config(wraplength = 400, justify = 'left', text = ' Please type in a set of data seperated by a "," and press enter: ', bd = 1, relief = 'solid')
+            main_entry_label.place(anchor = 'nw', x = -3, y = 20)
+
             # ENTRY
-            global set_entry_box
-            set_entry_box = tk.Entry(master, bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
-            set_entry_box.place(anchor = 'nw', x = -3, y = 48)
-            set_entry_box.insert(0, "1,2,True,4")
-            
-            set_entry_box.bind("<Return>", lambda e: val_ent(e, apply_button, set_entry_box.get()))
+            main_entry_box.config(bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
+            main_entry_box.place(anchor = 'nw', x = -3, y = 48)
+            main_entry_box.insert(0, "1,2,True,4")
+            main_entry_box.bind("<Return>", lambda e: val_ent(e, apply_button, widget = main_entry_box))
 
             # BOXES
-            set_add_button = tk.Button(master, text = "Add random item", command = lambda: add_rand(input_obj, apply_button))
-            set_add_button.place(anchor= 'nw', x = 210, y = 100)
+            general_button1.config(text = "Add random item", command = lambda: add_rand(input_obj, apply_button))
+            general_button1.place(anchor= 'nw', x = 10, y = 100)
 
-            set_remove_end = tk.Button(master, text = "Remove random item", command = lambda: remove_end(input_obj, apply_button))
-            set_remove_end.place(anchor = 'nw', x = 210, y = 127)
+            general_button2.config(text = "Remove random item", command = lambda: remove_end(input_obj, apply_button))
+            general_button2.place(anchor = 'nw', x = 10, y = 127)
 
         case 4: # Frozenset
             input_obj = frozenset()
             set_pos_seq(BUILT_IN_DSA_POS)
+
             # LABELS
-            general_label.config(text = 'frozen sets Input: ')
+            top_label.config(text = 'frozen sets Input: ')
             
             general_bullet.config(text = "Frozen sets:\n - Are unordered \n - Unchangeable \n - No duplicates \n - Immutable")
             general_bullet.place(anchor = 'nw', x = 338, y = 87)
 
-            fset_input_label = tk.Label(master, wraplength = 400, justify = 'left', text = ' Please type in a set of data seperated by a "," and press enter to create a new frozen set: ', bd = 1, relief = 'solid')
-            fset_input_label.place(anchor = 'nw', x = -3, y = 15)
+            main_entry_label.config(wraplength = 400, justify = 'left', text = ' Please type in a set of data seperated by a "," and press enter to create a new frozen set: ', bd = 1, relief = 'solid')
+            main_entry_label.place(anchor = 'nw', x = -3, y = 15)
+
             # ENTRY
-            global fset_entry_box
-            fset_entry_box = tk.Entry(master, bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
-            fset_entry_box.place(anchor = 'nw', x = -3, y = 55)
-            fset_entry_box.insert(0, "1,2,True,4")
-            
-            fset_entry_box.bind("<Return>", lambda e: val_ent(e, apply_button, fset_entry_box.get()))
+            main_entry_box.config(bd = 3, width = 47, validate = 'key', validatecommand = (vcmd, "%P"))
+            main_entry_box.place(anchor = 'nw', x = -3, y = 55)
+            main_entry_box.insert(0, "1,2,True,4")
+            main_entry_box.bind("<Return>", lambda e: val_ent(e, apply_button, widget = main_entry_box))
             
         case 10: # Stacks
             stack_obj = dsa.stack()
@@ -231,21 +224,21 @@ def Input_Def(master, x, apply_button):
             set_pos_seq([[354, 20]])
 
             # Labels
-            general_label.config(text = 'Stack Input: ')
+            top_label.config(text = 'Stack Input: ')
+
+            main_entry_label.config(text = "Please enter in a stack item: ")
                         
             general_bullet.config(text = "Stacks:\n - [LIFO] \n Built top down \n - Uses List type")
             general_bullet.place(anchor = 'nw', x = 342, y = 100)
 
             # Entrys
-            global stack_entry
-            stack_entry = tk.Entry(master, bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
-            stack_entry.place(anchor = 'nw', x = -3, y = 55)
-            stack_entry.bind("<Return>", lambda e: stack_prop(apply_button, stack_obj, stack_entry.get(), opp = "push"))
+            main_entry_box.config(bd = 3, width = 10, validate = 'key', validatecommand = (vcmd, "%P"))
+            main_entry_box.place(anchor = 'nw', x = -3, y = 55)
+            main_entry_box.bind("<Return>", lambda e: stack_prop(apply_button, obj = stack_obj, widget = main_entry_box, opp = "push"))
 
             # Buttons
-            stack_button1 = tk.Button(master, text = "Pop off Stack", command = lambda: stack_prop(apply_button, stack_obj, opp = "pop"))
-            stack_button1.place(anchor= 'nw', x = 210, y = 100)
-
+            general_button1.config(text = "Pop off Stack", command = lambda: stack_prop(apply_button, obj = stack_obj, opp = "pop"))
+            general_button1.place(anchor = 'nw', x = 210, y = 100)
 
         case _:
             input_obj = []
@@ -255,8 +248,9 @@ def Input_Def(master, x, apply_button):
 
 # =================================================================================================
 
-def stack_prop(apply_button, obj, val = None, opp = None):
+def stack_prop(apply_button, obj, widget, opp = None):
     global input_obj
+    val = widget.get()
     apply_button.config(bg = 'pink', activebackground = 'pink')
     match opp:
         case "push":
@@ -269,7 +263,7 @@ def stack_prop(apply_button, obj, val = None, opp = None):
             return_str = obj.size()
     
     input_obj = obj.stack
-    stack_entry.delete(0, tk.END)
+    widget.delete(0, tk.END)
         
 
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
@@ -300,103 +294,35 @@ def entry_checker(curr_val):
 #           - event triggered
 #           - Returns None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-def val_ent(e, apply_button, val):
+def val_ent(e, apply_button, widget):
     global input_obj
-    # Changes apply button to pink
+    
     apply_button.config(bg = 'pink', activebackground = 'pink')
+    val = widget.get()
     temp_list = val.split(',')
 
+    for x in reversed(temp_list):
+        if x == ',' or x == '':
+            temp_list.remove(x)
+
     if type(input_obj) == list:
-        # Remove existing items
-        input_obj.clear()
-
-        # Append new items
-        for x in range(0, len(temp_list)):
-            input_obj.append(temp_list[x])
-
-        # Check for any additional list unwanteds
-        for x in reversed(input_obj):
-            if x == ',':
-                input_obj.remove(x)
-            if x == '':
-                input_obj.remove(x)
-        main_box.delete(0, tk.END)
-        
-    # Error checking for bad input, currently works for none ":" in the entry box
-    # configs the label text and position to GUI the user
-    if type(input_obj) == dict:
-        if val.find(':') == -1:
-            dic_entry1_label.config(font = ("bold", 10), text = "BAD INPUT, PLEASE ENTER Key:Value \n EX: 1:2", foreground = 'red')
-            dic_entry1_label.place(x = -3, y = 6)
-            return
-        else:
-            dic_entry1_label.config(foreground = 'black', font = "TkDefaultFont", text = ' Please type in a dictionary of data seperated by a ":" and press enter: ')
-            dic_entry1_label.place(anchor= 'nw', x = -4, y = 15)
-
-        # removes previous data
-        input_obj.clear()
-        temp_list = val.split(',')
+        input_obj = temp_list
+    elif type(input_obj) == tuple:
+        input_obj = tuple(temp_list)
+    elif type(input_obj) == set:
+        input_obj = set(temp_list)  
+    elif type(input_obj) == frozenset:
+        input_obj = frozenset(temp_list)
+    elif type(input_obj) == dict:
         # Adds list objects after removing ',' and ':'
         for x in range(0, len(temp_list)):
             temp_val = temp_list[x]
             temp_other = temp_val.split(':')
             input_obj.update({temp_other[0] : temp_other[1]})
-
-        # Checks that the data is not a space or commma
-        for x in reversed(input_obj):
-            if x == ',':
-                input_obj.pop(x)
-            if x == '':
-                input_obj.pop(x)
-        dic_entry_box.delete(0, tk.END)
-
-
-    if type(input_obj) == tuple:
-        # Remove existing items
-        input_obj = () # sets global input_obj with nothing
-        temp_list = val.split(',')
-
-        # Check for any additional list unwanteds
-        for x in reversed(temp_list):
-            if x == ',':
-                temp_list.remove(x)
-            if x == '':
-                temp_list.remove(x)
-
-        input_obj = tuple(temp_list)
         
-        tuple_entry_box.delete(0, tk.END)
-
-
-    if type(input_obj) == set:
-        # Unordered, unchangeable, unidexed, multiple data types
-        input_obj.clear()
-
-        for x in reversed(temp_list):
-            if x == ',':
-                temp_list.remove(x)
-            if x == '':
-                temp_list.remove(x)
-                
-        for x in temp_list:
-            input_obj.add(x)
         
-        set_entry_box.delete(0, tk.END)
+    widget.delete(0, tk.END)
 
-    if type(input_obj) == frozenset:
-        input_obj = frozenset()
-        temp_list = val.split(',')
-        
-        # Check for any additional list unwanteds
-        for x in reversed(temp_list):
-            if x == ',':
-                temp_list.remove(x)
-            if x == '':
-                temp_list.remove(x)
-
-        input_obj = frozenset(temp_list)
-        
-        fset_entry_box.delete(0, tk.END)
 # =================================================================================================
 
 
@@ -486,11 +412,11 @@ def change_index(index_entry, val_entry, input_obj, apply_button):
 #       - Returns None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-def join_tuple(e, apply_button, val):
+def join_tuple(e, apply_button, widget):
     # Changes apply button to pink
     global input_obj
     apply_button.config(bg = 'pink', activebackground = 'pink')
-    
+    val = widget.get()
     temp_list = val.split(',')
         
     # Check for any additional list unwanteds
@@ -502,7 +428,7 @@ def join_tuple(e, apply_button, val):
             
     input_obj = tuple(input_obj) + tuple(temp_list)
         
-    tuple_entry_box2.delete(0, tk.END)
+    widget.delete(0, tk.END)
     
 # =================================================================================================
 
@@ -510,9 +436,10 @@ def join_tuple(e, apply_button, val):
 # - Create new tuple of random integers based on size of val
 #       - Returns None
 # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
-def rand_tuple_size(e, apply_button, val):
+def rand_tuple_size(e, apply_button, widget):
     global input_obj
     apply_button.config(bg = 'pink', activebackground = 'pink')
+    val = widget.get()
     if val.isalpha():
         return
 
@@ -521,7 +448,7 @@ def rand_tuple_size(e, apply_button, val):
         temp_list.append(ran.randint(0, 1000))
 
     input_obj = tuple(temp_list)
-    tuple_entry_box3.delete(0, tk.END)
+    widget.delete(0, tk.END)
 
 # =================================================================================================
 
